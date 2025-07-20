@@ -3,11 +3,11 @@ import { ValueLabel } from '@/types/common.types'
 const communityValueLabels: ValueLabel[] = [
   {
     value: 'DCINSIDE',
-    label: '디시인사이드',
+    label: '디시',
   },
   {
     value: 'FMKOREA',
-    label: '에펨코리아',
+    label: '펨코',
   },
   {
     value: 'THEQOO',

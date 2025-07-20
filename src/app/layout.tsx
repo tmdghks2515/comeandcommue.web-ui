@@ -4,8 +4,8 @@ import { Suspense } from 'react'
 import Providers from '@/components/providers/Providers'
 
 export const metadata: Metadata = {
-  title: '츄르르 관리자',
-  description: '메이드 카페의 수익을 다양하게',
+  title: '커뮤커뮤',
+  description: '',
 }
 
 export default function RootLayout({
