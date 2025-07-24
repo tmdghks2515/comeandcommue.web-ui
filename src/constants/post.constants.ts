@@ -45,22 +45,22 @@ const communityValueLabels: ValueLabel[] = [
     value: 'BOBAEDREAM',
     label: '보배드림',
   },
-  {
-    value: 'INSTIZ',
-    label: '인스티즈',
-  },
-  {
-    value: 'HUMORUNIV',
-    label: '유머유니버스',
-  },
-  {
-    value: 'ETOLAND',
-    label: '에토랜드',
-  },
-  {
-    value: 'COOK82',
-    label: '82쿡',
-  },
+  // {
+  //   value: 'INSTIZ',
+  //   label: '인스티즈',
+  // },
+  // {
+  //   value: 'HUMORUNIV',
+  //   label: '유머유니버스',
+  // },
+  // {
+  //   value: 'ETOLAND',
+  //   label: '에토랜드',
+  // },
+  // {
+  //   value: 'COOK82',
+  //   label: '82쿡',
+  // },
 ]
 
 const communityLabelMap: Record<string, string> = communityValueLabels.reduce(

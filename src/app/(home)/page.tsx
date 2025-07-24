@@ -1,126 +1,97 @@
 'use client'
 
-import { communityLabelMap } from '@/constants/post.constants'
+import { communityValueLabels } from '@/constants/post.constants'
 import { postQueryService } from '@/core/services/post.query.service'
 import useApi from '@/hooks/useApi'
-import { Chip, List, ListItem, Sheet, Stack, styled, SvgIconPropsSizeOverrides } from '@mui/joy'
-import Image from 'next/image'
-import { useEffect } from 'react'
-import CommentIcon from '@mui/icons-material/Comment'
-import ThumbUpIcon from '@mui/icons-material/ThumbUp'
-import ViewIcon from '@mui/icons-material/Visibility'
-
-const PostList = styled(List)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 1,
-}))
-
-const PostListItem = styled('a')(({ theme }) => ({
-  borderRadius: theme.radius.md,
-  backgroundColor: theme.vars.palette.background.level1,
-  '&:hover': {
-    backgroundColor: theme.vars.palette.background.level2,
-  },
-  width: '100%',
-  padding: theme.spacing(1),
-  display: 'flex',
-  flexDirection: 'row',
-  gap: theme.spacing(1),
-}))
-
-const CommunityName = styled(Sheet)(({ theme }) => ({
-  ...theme.typography['body-sm'],
-  textAlign: 'center',
-  fontWeight: theme.fontWeight.md,
-  fontSize: theme.fontSize.xs,
-  color: theme.vars.palette.text.secondary,
-  borderRadius: theme.radius.md,
-  backgroundColor: 'transparent',
-}))
-
-const Title = styled(Sheet)(({ theme }) => ({
-  ...theme.typography['body-md'],
-  fontWeight: theme.fontWeight.md,
-  fontSize: theme.fontSize.sm,
-  backgroundColor: 'transparent',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  display: '-webkit-box',
-  WebkitLineClamp: 2,
-  WebkitBoxOrient: 'vertical',
-  whiteSpace: 'normal',
-  flexGrow: 1,
-  flexShrink: 1,
-  flexBasis: '0',
-}))
-
-const InfoStack = styled(Stack)(({ theme }) => ({
-  ...theme.typography['body-xs'],
-  color: theme.vars.palette.text.tertiary,
-  fontWeight: theme.fontWeight.md,
-  fontSize: theme.fontSize.xs,
-  marginTop: theme.spacing(0.5),
-}))
+import { List, ListItem, Sheet, styled } from '@mui/joy'
+import { useEffect, useRef, useState } from 'react'
+import CommunityChips from './_components/CommunityChips'
+import { PostDto } from '@/core/dto/post/post.dto'
+import PostListItem from './_components/PostListItem'
+import useInfiniteScroll from '@/hooks/useInfiniteScroll'
+import { RecentPostsQuery } from '@/core/dto/post/post.query.dto'
+import MainHeader from '@/components/layout/MainHeader'
 
 export default function Home() {
-  const { data: posts } = useApi({
+  const [selectedCommunities, setSelectedCommunities] = useState<string[]>(communityValueLabels.map((c) => c.value))
+  const [posts, setPosts] = useState<PostDto[]>([])
+  const [filteredPosts, setFilteredPosts] = useState<PostDto[]>([])
+  const [lastCreatedAt, setLastCreatedAt] = useState<string>()
+  const [isFetching, setIsFetching] = useState(false)
+  const [hasNextPage, setHasNextPage] = useState(true)
+
+  const { execute } = useApi<RecentPostsQuery, PostDto[]>({
     api: postQueryService.getRecentPosts,
     executeImmediately: true,
     initalParams: {
       communityTypes: [],
       pageSize: 50,
     },
+    onSuccess(data) {
+      setPosts((prev) => [...prev, ...data])
+      setHasNextPage(data.length > 0)
+    },
+    onComplete() {
+      setIsFetching(false)
+    },
+  })
+
+  const sentinelRef = useRef<HTMLDivElement | null>(null)
+
+  useInfiniteScroll({
+    targetRef: sentinelRef,
+    onLoadMore: () => setLastCreatedAt(posts?.[posts.length - 1]?.createdAt),
+    hasNextPage,
+    isFetching,
   })
 
   useEffect(() => {
-    console.log(posts)
-  }, [posts])
+    if (!lastCreatedAt || !hasNextPage) return
+
+    setIsFetching(true)
+    execute({ communityTypes: [], pageSize: 50, lastCreatedAt })
+  }, [lastCreatedAt])
+
+  useEffect(() => {
+    if (posts) {
+      const filtered = posts.filter((post) =>
+        selectedCommunities.length > 0 ? selectedCommunities.includes(post.communityType) : true,
+      )
+      setFilteredPosts(filtered)
+    }
+  }, [posts, selectedCommunities])
 
   return (
-    <main>
-      <PostList>
-        {posts?.map((post) => (
-          <ListItem key={post.id}>
-            <PostListItem href={post.linkHref} target="_blank" rel="noopener noreferrer">
-              {post.thumbnailSrc && (
-                <Image
-                  src={post.thumbnailSrc}
-                  alt={post.title}
-                  width={80}
-                  height={80}
-                  style={{ borderRadius: '4px', objectFit: 'cover' }}
-                />
-              )}
-              <Stack justifyContent="space-between">
-                <div className="flex gap-1">
-                  <Chip color="primary">{communityLabelMap[post.communityType]}</Chip>
-                  <Title>{post.title}</Title>
-                </div>
-                <InfoStack direction="row" spacing={2}>
-                  <span>{post.authorName}</span>
-                  <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-                  {post.likeCount && (
-                    <span>
-                      <ThumbUpIcon fontSize="sm" /> {post.likeCount}
-                    </span>
-                  )}
-                  {post.commentCount && (
-                    <span>
-                      <CommentIcon fontSize="sm" /> {post.commentCount}
-                    </span>
-                  )}
-                  {post.viewCount && (
-                    <span>
-                      <ViewIcon fontSize="sm" /> {post.viewCount}
-                    </span>
-                  )}
-                </InfoStack>
-              </Stack>
-            </PostListItem>
-          </ListItem>
-        ))}
-      </PostList>
-    </main>
+    <>
+      <MainHeader />
+
+      <Container>
+        <CommunityChips selected={selectedCommunities} onChange={setSelectedCommunities} />
+
+        <PostList>
+          {filteredPosts?.map((post) => (
+            <ListItem key={post.id} sx={{ padding: 0 }}>
+              <PostListItem post={post} />
+            </ListItem>
+          ))}
+        </PostList>
+
+        <div ref={sentinelRef} style={{ height: '1px' }} />
+        {isFetching && <p style={{ textAlign: 'center' }}>로딩 중...</p>}
+      </Container>
+    </>
   )
 }
+
+const Container = styled(Sheet)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(1),
+  padding: theme.spacing(1.5),
+}))
+
+const PostList = styled(List)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(1.5),
+}))
