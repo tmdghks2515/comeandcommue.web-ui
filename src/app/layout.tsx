@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { Suspense } from 'react'
 import Providers from '@/components/providers/Providers'
+import GlobalChat from '@/components/chat/globalChat/GlobalChat'
 
 export const metadata: Metadata = {
   title: '커뮤커뮤',
@@ -22,6 +23,8 @@ export default function RootLayout({
               <Suspense>{children}</Suspense>
             </div>
           </div>
+
+          <GlobalChat />
         </Providers>
       </body>
     </html>

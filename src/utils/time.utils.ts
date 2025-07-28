@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 export function formatRelativeTime(input: Date | number): string {
   const now = new Date()
   const target = typeof input === 'number' ? new Date(input) : input
@@ -27,4 +29,13 @@ export function formatRelativeTime(input: Date | number): string {
   const day = String(target.getDate()).padStart(2, '0')
 
   return `${year}/${month}/${day}`
+}
+
+export function formatDateTime(input: Date | number): string {
+  const date = dayjs(input)
+  const now = dayjs()
+
+  const isToday = date.isSame(now, 'day')
+
+  return isToday ? date.format('HH:mm') : date.format('YYYY-MM-DD HH:mm')
 }

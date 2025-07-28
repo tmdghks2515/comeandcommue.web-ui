@@ -9,7 +9,7 @@ import CommunityChips from './_components/CommunityChips'
 import { PostDto } from '@/core/dto/post/post.dto'
 import PostListItem from './_components/PostListItem'
 import useInfiniteScroll from '@/hooks/useInfiniteScroll'
-import { RecentPostsQuery } from '@/core/dto/post/post.query.dto'
+import { RecentPostsQuery } from '@/core/dto/post/post.query'
 import MainHeader from '@/components/layout/MainHeader'
 
 export default function Home() {

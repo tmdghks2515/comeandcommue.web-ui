@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios'
-import { RecentPostsQuery } from '../dto/post/post.query.dto'
+import { RecentPostsQuery } from '../dto/post/post.query'
 import { PostDto } from '../dto/post/post.dto'
 import axiosInstance from '../axios'
 
