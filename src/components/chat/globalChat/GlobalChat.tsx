@@ -121,24 +121,32 @@ function GlobalChat() {
 
 export default memo(GlobalChat)
 
-const GlobalChatWrapper = styled('div')(() => ({
+const GlobalChatWrapper = styled('div')(({ theme }) => ({
   position: 'fixed',
   bottom: 0,
   left: 0,
   display: 'flex',
   flexDirection: 'column',
-  backgroundColor: 'rgba(0, 0, 0, 0.1)',
-  maxWidth: '50rem',
+  backgroundColor: 'rgba(0, 0, 0, 0.36)',
   maxHeight: '30vh',
+  borderRadius: '.3rem',
+  padding: theme.spacing(1),
+  fontSize: '.9rem',
+
+  // 데스크탑 (md 이상)
+  [theme.breakpoints.up('md')]: {
+    width: '30rem',
+  },
 }))
 
 const GlobalChatInput = styled('input')(({ theme }) => ({
-  backgroundColor: 'rgba(0, 0, 0, 0.8)',
   width: '100%',
   padding: theme.spacing(1),
   border: `1px solid ${theme.palette.divider}`,
   fontSize: '1rem',
-  color: '#fefefe',
+  outline: 'none',
+  backgroundColor: 'white',
+  borderRadius: '.3rem',
 }))
 
 const MessagesWrapper = styled('div')(({ theme }) => ({
@@ -146,21 +154,16 @@ const MessagesWrapper = styled('div')(({ theme }) => ({
   flexGrow: 1,
   overflowY: 'auto',
   padding: theme.spacing(1),
-  backgroundColor: 'rgba(0, 0, 0, 0.2)',
 }))
 
 const MessageItem = styled('p')(({ theme }) => ({
   margin: theme.spacing(0.5, 0),
   color: '#fefefe',
   '& span': {
-    display: 'inline-block',
     marginRight: theme.spacing(1),
   },
   '& span:first-of-type': {
-    color: theme.palette.text.secondary,
-  },
-  '& span:nth-of-type(2)': {
-    fontWeight: 'bold',
+    color: '#eee',
   },
 }))
 

@@ -10,7 +10,6 @@ import { PostDto } from '@/core/dto/post/post.dto'
 import PostListItem from './_components/PostListItem'
 import useInfiniteScroll from '@/hooks/useInfiniteScroll'
 import { RecentPostsQuery } from '@/core/dto/post/post.query'
-import MainHeader from '@/components/layout/MainHeader'
 
 export default function Home() {
   const [selectedCommunities, setSelectedCommunities] = useState<string[]>(communityValueLabels.map((c) => c.value))
@@ -63,8 +62,6 @@ export default function Home() {
 
   return (
     <>
-      <MainHeader />
-
       <Container>
         <CommunityChips selected={selectedCommunities} onChange={setSelectedCommunities} />
 

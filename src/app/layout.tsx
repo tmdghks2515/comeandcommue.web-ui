@@ -3,6 +3,8 @@ import './globals.css'
 import { Suspense } from 'react'
 import Providers from '@/components/providers/Providers'
 import GlobalChat from '@/components/chat/globalChat/GlobalChat'
+import MainHeader from '@/components/layout/MainHeader'
+import MainLayout from '@/components/layout/MainLayout'
 
 export const metadata: Metadata = {
   title: '커뮤커뮤',
@@ -15,18 +17,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ko">
-      <body>
+    <Suspense>
+      <MainLayout>
         <Providers>
-          <div className="w-full flex justify-center items-center">
-            <div className="min-h-screen flex flex-col w-full lg:max-w-5xl">
-              <Suspense>{children}</Suspense>
-            </div>
-          </div>
-
+          <MainHeader />
+          {children}
           <GlobalChat />
         </Providers>
-      </body>
-    </html>
+      </MainLayout>
+    </Suspense>
   )
 }
