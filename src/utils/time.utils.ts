@@ -32,6 +32,7 @@ export function formatRelativeTime(input: Date | number): string {
 }
 
 export function formatDateTime(input: Date | number): string {
+  console.log('input date~~~', input)
   const date = dayjs(input)
   const now = dayjs()
 

@@ -1,10 +1,8 @@
 import type { NextConfig } from 'next'
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 
 const nextConfig: NextConfig = {
-  output: 'export',
   reactStrictMode: false,
-  trailingSlash: true,
   productionBrowserSourceMaps: true,
   webpack(config) {
     if (process.env.ANALYZE === 'true') {
@@ -28,6 +26,13 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+  },
+  async rewrites() {
+    return [
+      { source: '/api/user/:path*', destination: process.env.NEXT_PUBLIC_USER_API_URL + '/:path*' },
+      { source: '/api/post/:path*', destination: process.env.NEXT_PUBLIC_POST_API_URL + '/:path*' },
+      { source: '/api/chat/:path*', destination: process.env.NEXT_PUBLIC_CHAT_API_URL + '/:path*' },
+    ]
   },
 }
 

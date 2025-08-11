@@ -1,22 +1,20 @@
 'use client'
 
 import { ChatMessageDto } from '@/core/dto/chat/chat.dto'
+import useLoginUserStore from '@/store/useLoginUserStore'
 import { formatDateTime } from '@/utils/time.utils'
 import { styled } from '@mui/joy'
 import { memo, useEffect, useRef, useState } from 'react'
 
-const user = {
-  nickname: '초록색 얼굴이 사각형인 고양이',
-}
-
 function GlobalChat() {
   const [messages, setMessages] = useState<ChatMessageDto[]>([])
   const [input, setInput] = useState('')
-  const [isChatInputFocused, setIsChatInputFocused] = useState(false)
+
   const ws = useRef<WebSocket | null>(null)
   const chatInputRef = useRef<HTMLInputElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const messagesWrapperRef = useRef<HTMLDivElement>(null)
+  const loginUser = useLoginUserStore((state) => state.loginUser)
 
   // 2. 메시지 전송
   const sendMessage = () => {
@@ -24,7 +22,8 @@ function GlobalChat() {
       ws.current.send(
         JSON.stringify({
           content: input,
-          sender: user.nickname,
+          senderNickname: loginUser.nickname,
+          senderId: loginUser.id,
         }),
       )
       setInput('')
@@ -73,7 +72,6 @@ function GlobalChat() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault()
-        setIsChatInputFocused(true)
         chatInputRef.current?.focus()
       }
     }
@@ -100,7 +98,7 @@ function GlobalChat() {
         {messages.map((msg, idx) => (
           <MessageItem key={idx}>
             <span>{formatDateTime(msg.timestamp)}</span>
-            <Nickname>{msg.sender}</Nickname>
+            <Nickname>{msg.senderNickname}</Nickname>
             <span>{msg.content}</span>
           </MessageItem>
         ))}

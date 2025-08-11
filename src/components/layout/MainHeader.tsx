@@ -2,8 +2,11 @@
 
 import { styled, Typography } from '@mui/joy'
 import WhatshotIcon from '@mui/icons-material/Whatshot'
+import useLoginUserStore from '@/store/useLoginUserStore'
 
 export default function MainHeader() {
+  const loginUser = useLoginUserStore((state) => state.loginUser)
+
   return (
     <HeaderWrapper>
       {/* 로고 */}
@@ -20,7 +23,7 @@ export default function MainHeader() {
       </HeaderCenter>
 
       <HeaderRight>
-        <Nickname>멍청한거대빨강원숭이</Nickname>
+        <Nickname>{loginUser?.nickname}</Nickname>
       </HeaderRight>
     </HeaderWrapper>
   )

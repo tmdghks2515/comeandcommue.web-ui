@@ -1,8 +1,8 @@
 type ChatMessageDto = {
   content: string
-  sender: string
-  ip: string
-  timestamp: number
+  senderId: string
+  senderNickname: string
+  timestamp: Date
 }
 
 export type { ChatMessageDto }
