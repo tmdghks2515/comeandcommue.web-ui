@@ -1,0 +1,74 @@
+import { ChatMessageDto } from '@/core/dto/chat/chat.dto'
+import { formatDateTime } from '@/utils/time.utils'
+import { styled } from '@mui/joy'
+import { memo, useCallback } from 'react'
+
+type Props = {
+  messages: ChatMessageDto[]
+  topRef: React.RefObject<HTMLDivElement | null>
+  bottomRef: React.RefObject<HTMLDivElement | null>
+  wrapperRef?: React.RefObject<HTMLDivElement | null>
+  folded: boolean
+}
+
+const nicknameColors = [
+  '#00ffa3', // 청록(기준색)
+  '#ff4fa3', // 핑크
+  '#ff6f4f', // 주황빛 레드
+  '#4f9fff', // 블루
+  '#ffe14f', // 옐로우
+]
+
+function GlobalChatMessages({ messages, topRef, bottomRef, wrapperRef, folded }: Props) {
+  const getColorFromNickname = useCallback(
+    (nickname: string) => {
+      let hash = 0
+      for (let i = 0; i < nickname.length; i++) {
+        hash = nickname.charCodeAt(i) + ((hash << 5) - hash)
+      }
+      const index = Math.abs(hash) % nicknameColors.length
+      return nicknameColors[index]
+    },
+    [nicknameColors],
+  )
+
+  return (
+    <MessagesRoot ref={wrapperRef} folded={folded}>
+      <div ref={topRef} />
+      {messages.map((msg, idx) => (
+        <MessageItem key={idx} nicknameColor={getColorFromNickname(msg.senderNickname)}>
+          <span>[{formatDateTime(msg.timestamp)}]</span>
+          <span>{msg.senderNickname}</span>
+          <span>{msg.content}</span>
+        </MessageItem>
+      ))}
+      {/* 최하단 고정용 ref */}
+      <div ref={bottomRef} />
+    </MessagesRoot>
+  )
+}
+
+export default memo(GlobalChatMessages)
+
+const MessagesRoot = styled('div')<{ folded: boolean }>(({ theme, folded }) => ({
+  flex: 1,
+  flexGrow: 1,
+  overflowY: 'auto',
+  padding: theme.spacing(1),
+  maxHeight: folded ? '4vh' : '30vh',
+}))
+
+const MessageItem = styled('p')<{ nicknameColor: string }>(({ theme, nicknameColor }) => ({
+  margin: theme.spacing(0.5, 0),
+  color: '#fefefe',
+  '& span': {
+    marginRight: theme.spacing(1),
+  },
+  '& span:first-of-type': {
+    color: '#cfcfcf',
+  },
+  '& span:nth-of-type(2)': {
+    fontWeight: 'bold',
+    color: nicknameColor,
+  },
+}))

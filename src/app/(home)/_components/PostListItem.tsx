@@ -136,4 +136,7 @@ const StatGroup = styled('div')(({ theme }) => ({
   gap: 8,
   flexWrap: 'wrap',
   color: theme.vars.palette.text.tertiary,
+  '& *': {
+    color: theme.vars.palette.text.tertiary,
+  },
 }))

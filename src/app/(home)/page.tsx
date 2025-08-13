@@ -3,7 +3,7 @@
 import { communityValueLabels } from '@/constants/post.constants'
 import { postQueryService } from '@/core/services/post.query.service'
 import useApi from '@/hooks/useApi'
-import { List, ListItem, Sheet, styled } from '@mui/joy'
+import { List, ListItem, Sheet, styled, useColorScheme } from '@mui/joy'
 import { useEffect, useRef, useState } from 'react'
 import CommunityChips from './_components/CommunityChips'
 import { PostDto } from '@/core/dto/post/post.dto'
@@ -18,6 +18,8 @@ export default function Home() {
   const [lastCreatedAt, setLastCreatedAt] = useState<string>()
   const [isFetching, setIsFetching] = useState(false)
   const [hasNextPage, setHasNextPage] = useState(true)
+
+  const { mode, systemMode } = useColorScheme()
 
   const { execute } = useApi<RecentPostsQuery, PostDto[]>({
     api: postQueryService.getRecentPosts,
@@ -61,22 +63,21 @@ export default function Home() {
   }, [posts, selectedCommunities])
 
   return (
-    <>
-      <Container>
-        <CommunityChips selected={selectedCommunities} onChange={setSelectedCommunities} />
+    <Container>
+      {systemMode}
+      <CommunityChips selected={selectedCommunities} onChange={setSelectedCommunities} />
 
-        <PostList>
-          {filteredPosts?.map((post) => (
-            <ListItem key={post.id} sx={{ padding: 0 }}>
-              <PostListItem post={post} />
-            </ListItem>
-          ))}
-        </PostList>
+      <PostList>
+        {filteredPosts?.map((post) => (
+          <ListItem key={post.id} sx={{ padding: 0 }}>
+            <PostListItem post={post} />
+          </ListItem>
+        ))}
+      </PostList>
 
-        <div ref={sentinelRef} style={{ height: '1px' }} />
-        {isFetching && <p style={{ textAlign: 'center' }}>로딩 중...</p>}
-      </Container>
-    </>
+      <div ref={sentinelRef} style={{ height: '1px' }} />
+      {isFetching && <p style={{ textAlign: 'center' }}>로딩 중...</p>}
+    </Container>
   )
 }
 
@@ -85,6 +86,7 @@ const Container = styled(Sheet)(({ theme }) => ({
   flexDirection: 'column',
   gap: theme.spacing(1),
   padding: theme.spacing(1.5),
+  backgroundColor: theme.palette.background.body,
 }))
 
 const PostList = styled(List)(({ theme }) => ({

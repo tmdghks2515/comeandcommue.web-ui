@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { Suspense } from 'react'
 import Providers from '@/components/providers/Providers'
 import GlobalChat from '@/components/chat/globalChat/GlobalChat'
 import MainHeader from '@/components/layout/MainHeader'
@@ -17,14 +16,16 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <Suspense>
-      <MainLayout>
+    <html lang="ko" suppressHydrationWarning={true}>
+      <body>
         <Providers>
-          <MainHeader />
-          {children}
-          <GlobalChat />
+          <MainLayout>
+            <MainHeader />
+            {children}
+            <GlobalChat />
+          </MainLayout>
         </Providers>
-      </MainLayout>
-    </Suspense>
+      </body>
+    </html>
   )
 }

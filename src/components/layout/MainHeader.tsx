@@ -1,41 +1,43 @@
 'use client'
 
-import { styled, Typography } from '@mui/joy'
+import { Button, IconButton, styled, Typography, useColorScheme } from '@mui/joy'
 import WhatshotIcon from '@mui/icons-material/Whatshot'
+import LightModeIcon from '@mui/icons-material/LightMode'
+import DarkModeIcon from '@mui/icons-material/DarkMode'
 import useLoginUserStore from '@/store/useLoginUserStore'
 
 export default function MainHeader() {
+  const { mode, setMode } = useColorScheme()
   const loginUser = useLoginUserStore((state) => state.loginUser)
 
   return (
-    <HeaderWrapper>
-      {/* 로고 */}
-
-      <HeaderLeft>
+    <HeaderRoot>
+      <HeaderPart1>
         <Title>summit</Title>
-      </HeaderLeft>
+      </HeaderPart1>
 
-      <HeaderCenter>
-        <NavLink active>
-          <TrendingIcon />
+      <HeaderPart2>
+        <Button startDecorator={<WhatshotIcon />} variant="plain" color="neutral" size="sm">
           트렌딩
-        </NavLink>
-      </HeaderCenter>
+        </Button>
+      </HeaderPart2>
 
-      <HeaderRight>
+      <HeaderPart3>
+        <IconButton onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}>
+          {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+        </IconButton>
         <Nickname>{loginUser?.nickname}</Nickname>
-      </HeaderRight>
-    </HeaderWrapper>
+      </HeaderPart3>
+    </HeaderRoot>
   )
 }
 
-const HeaderWrapper = styled('header')(({ theme }) => ({
+const HeaderRoot = styled('header')(({ theme }) => ({
   padding: `${theme.spacing(2)} ${theme.spacing(1)}`,
   borderBottom: `1px solid ${theme.palette.divider}`,
-  display: 'grid',
-  gridTemplateColumns: 'auto 1fr auto',
+  display: 'flex',
+  alignItems: 'center',
   // gridTemplateColumns: 'auto 1fr auto',
-  alignItems: 'baseline',
 
   // 태블릿 이상
   [theme.breakpoints.up('sm')]: {
@@ -43,45 +45,29 @@ const HeaderWrapper = styled('header')(({ theme }) => ({
   },
 }))
 
-const HeaderLeft = styled('div')({
+const HeaderPart1 = styled('div')({
   display: 'flex',
 })
 
-const HeaderCenter = styled('div')({
+const HeaderPart2 = styled('div')({
   display: 'flex',
-  paddingLeft: '6rem',
+  flex: 1,
 })
 
-const HeaderRight = styled('div')({
+const HeaderPart3 = styled('div')({
   display: 'flex',
+  alignItems: 'center',
+  gap: 8,
 })
 
 const Title = styled(Typography)(({ theme }) => ({
   fontWeight: 'bold',
   fontSize: '1.5rem',
-  color: theme.palette.primary.plainColor,
+  marginRight: theme.spacing(4),
 }))
 
 const Nickname = styled('span')(({ theme }) => ({
   color: theme.palette.text.secondary,
   fontSize: '.8rem',
   fontWeight: theme.fontWeight.lg,
-}))
-
-interface NavLinkProps {
-  active?: boolean
-}
-const NavLink = styled('span', {
-  shouldForwardProp: (prop) => prop !== 'active', // styled-components v5 방식 (Emotion도 유사)
-})<NavLinkProps>(({ theme, active }) => ({
-  fontSize: '.9rem',
-  fontWeight: 'bold',
-  color: active ? theme.palette.text.secondary : theme.palette.text.tertiary,
-  cursor: 'pointer',
-}))
-
-const TrendingIcon = styled(WhatshotIcon)(({ theme }) => ({
-  marginTop: '-.3rem',
-  marginRight: '.2rem',
-  fontSize: '1.5rem',
 }))

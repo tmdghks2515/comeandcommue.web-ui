@@ -5,7 +5,6 @@ export function formatRelativeTime(input: Date | number): string {
   const target = typeof input === 'number' ? new Date(input) : input
   const diffMs = now.getTime() - target.getTime()
   const diffMinutes = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMs / 3600000)
 
   const isSameDay =
     now.getFullYear() === target.getFullYear() &&
@@ -32,11 +31,18 @@ export function formatRelativeTime(input: Date | number): string {
 }
 
 export function formatDateTime(input: Date | number): string {
-  console.log('input date~~~', input)
   const date = dayjs(input)
   const now = dayjs()
 
   const isToday = date.isSame(now, 'day')
+  if (isToday) {
+    return date.format('HH:mm')
+  }
 
-  return isToday ? date.format('HH:mm') : date.format('YYYY-MM-DD HH:mm')
+  const isThisYear = date.isSame(now, 'year')
+  if (isThisYear) {
+    return date.format('MM-DD HH:mm')
+  }
+
+  return date.format('YYYY-MM-DD HH:mm')
 }

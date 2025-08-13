@@ -4,15 +4,18 @@ import { styled } from '@mui/joy'
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko">
-      <body>
-        <MainLayoutWrapper>{children}</MainLayoutWrapper>
-      </body>
-    </html>
+    <MainLayoutRoot>
+      <MainLayoutContainer>{children}</MainLayoutContainer>
+    </MainLayoutRoot>
   )
 }
 
-const MainLayoutWrapper = styled('div')(({ theme }) => ({
+const MainLayoutRoot = styled('div')(({ theme }) => ({
+  backgroundColor: theme.palette.background.body,
+  minHeight: '100vh',
+}))
+
+const MainLayoutContainer = styled('div')(({ theme }) => ({
   width: '100%',
   maxWidth: '1200px',
   margin: '0 auto',
