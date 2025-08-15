@@ -1,35 +1,34 @@
 'use client'
 
-import { communityValueLabels } from '@/constants/post.constants'
 import { postQueryService } from '@/core/services/post.query.service'
 import useApi from '@/hooks/useApi'
 import { List, ListItem, Sheet, styled, useColorScheme } from '@mui/joy'
 import { useEffect, useRef, useState } from 'react'
-import CommunityChips from './_components/CommunityChips'
+import CommuFilterChips from './_components/CommuFilterChips'
 import { PostDto } from '@/core/dto/post/post.dto'
 import PostListItem from './_components/PostListItem'
 import useInfiniteScroll from '@/hooks/useInfiniteScroll'
 import { RecentPostsQuery } from '@/core/dto/post/post.query'
+import useCommuFilterStore from '@/store/useCommuFilterStore'
+
+const pageSize = 50
 
 export default function Home() {
-  const [selectedCommunities, setSelectedCommunities] = useState<string[]>(communityValueLabels.map((c) => c.value))
   const [posts, setPosts] = useState<PostDto[]>([])
-  const [filteredPosts, setFilteredPosts] = useState<PostDto[]>([])
   const [lastCreatedAt, setLastCreatedAt] = useState<string>()
   const [isFetching, setIsFetching] = useState(false)
   const [hasNextPage, setHasNextPage] = useState(true)
 
-  const { mode, systemMode } = useColorScheme()
+  const selectedCommunities = useCommuFilterStore((state) => state.selected)
 
-  const { execute } = useApi<RecentPostsQuery, PostDto[]>({
+  const { execute } = useApi({
     api: postQueryService.getRecentPosts,
-    executeImmediately: true,
-    initalParams: {
-      communityTypes: [],
-      pageSize: 50,
-    },
-    onSuccess(data) {
-      setPosts((prev) => [...prev, ...data])
+    onSuccess(data, params) {
+      if (params.lastCreatedAt) {
+        setPosts((prev) => [...prev, ...data])
+      } else {
+        setPosts(data)
+      }
       setHasNextPage(data.length > 0)
     },
     onComplete() {
@@ -50,25 +49,22 @@ export default function Home() {
     if (!lastCreatedAt || !hasNextPage) return
 
     setIsFetching(true)
-    execute({ communityTypes: [], pageSize: 50, lastCreatedAt })
+    execute({ communityTypes: selectedCommunities, pageSize, lastCreatedAt, isNextPage: true } as RecentPostsQuery)
   }, [lastCreatedAt])
 
   useEffect(() => {
-    if (posts) {
-      const filtered = posts.filter((post) =>
-        selectedCommunities.length > 0 ? selectedCommunities.includes(post.communityType) : true,
-      )
-      setFilteredPosts(filtered)
-    }
-  }, [posts, selectedCommunities])
+    if (lastCreatedAt) setLastCreatedAt(undefined)
+
+    setIsFetching(true)
+    execute({ communityTypes: selectedCommunities, pageSize, lastCreatedAt: undefined })
+  }, [selectedCommunities])
 
   return (
     <Container>
-      {systemMode}
-      <CommunityChips selected={selectedCommunities} onChange={setSelectedCommunities} />
+      <CommuFilterChips />
 
       <PostList>
-        {filteredPosts?.map((post) => (
+        {posts?.map((post) => (
           <ListItem key={post.id} sx={{ padding: 0 }}>
             <PostListItem post={post} />
           </ListItem>

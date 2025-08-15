@@ -18,7 +18,7 @@ export default function MainHeader() {
 
       <HeaderPart2>
         <Button startDecorator={<WhatshotIcon />} variant="plain" color="neutral" size="sm">
-          트렌딩
+          Hot
         </Button>
       </HeaderPart2>
 

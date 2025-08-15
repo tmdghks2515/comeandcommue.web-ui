@@ -8,8 +8,7 @@ type PostDto = {
   authorName: string
   hasImg: boolean
   likeCount: number
-  viewCount: number
-  commentCount: number
+  hitCount: number
   communityType: CommunityType
   postedAt: string // ISO date string
   createdAt: string // ISO date string

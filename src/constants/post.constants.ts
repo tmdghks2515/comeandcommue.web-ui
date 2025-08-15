@@ -22,29 +22,29 @@ const communityValueLabels: ValueLabel[] = [
     label: '루리웹',
   },
   {
-    value: 'MLBPARK',
-    label: 'MLB파크',
-  },
-  {
-    value: 'INVEN',
-    label: '인벤',
-  },
-  {
-    value: 'ARCALIVE',
-    label: '아카라이브',
-  },
-  {
-    value: 'NATEPANN',
-    label: '네이트판',
-  },
-  {
-    value: 'CLIEN',
-    label: '클리앙',
-  },
-  {
     value: 'BOBAEDREAM',
     label: '보배드림',
   },
+  // {
+  //   value: 'MLBPARK',
+  //   label: 'MLB파크',
+  // },
+  // {
+  //   value: 'INVEN',
+  //   label: '인벤',
+  // },
+  // {
+  //   value: 'ARCALIVE',
+  //   label: '아카라이브',
+  // },
+  // {
+  //   value: 'NATEPANN',
+  //   label: '네이트판',
+  // },
+  // {
+  //   value: 'CLIEN',
+  //   label: '클리앙',
+  // },
   // {
   //   value: 'INSTIZ',
   //   label: '인스티즈',

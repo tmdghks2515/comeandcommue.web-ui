@@ -5,18 +5,13 @@ import { communityLabelMap } from '@/constants/post.constants'
 import { PostDto } from '@/core/dto/post/post.dto'
 import { formatRelativeTime } from '@/utils/time.utils'
 import { Chip, Stack, styled } from '@mui/joy'
-import CommentIcon from '@mui/icons-material/Comment'
 import ThumbUpIcon from '@mui/icons-material/ThumbUp'
-import ViewIcon from '@mui/icons-material/Visibility'
+import MouseIcon from '@mui/icons-material/Mouse'
 import React from 'react'
 
 function PostListItem({ post }: { post: PostDto }) {
   return (
     <PostLink href={post.linkHref} target="_blank" rel="noopener noreferrer">
-      {post.thumbnailSrc && (
-        <Thumbnail src={post.thumbnailSrc} alt={post.title} width={100} height={100} placeholder="empty" />
-      )}
-
       <MetaWrapper spacing={1}>
         <HeaderRow>
           <Title>{post.title}</Title>
@@ -36,27 +31,22 @@ function PostListItem({ post }: { post: PostDto }) {
           </InfoGroup>
 
           <InfoGroup2>
-            <span>{formatRelativeTime(new Date(post.postedAt || post.createdAt))}</span>
+            <span>{formatRelativeTime(new Date(post.createdAt))}</span>
             <StatGroup>
-              {post.likeCount > 0 && (
-                <span>
-                  <ThumbUpIcon fontSize="inherit" /> {post.likeCount.toLocaleString()}
-                </span>
-              )}
-              {post.commentCount > 0 && (
-                <span>
-                  <CommentIcon fontSize="inherit" /> {post.commentCount.toLocaleString()}
-                </span>
-              )}
-              {post.viewCount > 0 && (
-                <span>
-                  <ViewIcon fontSize="inherit" /> {post.viewCount.toLocaleString()}
-                </span>
-              )}
+              <span>
+                <ThumbUpIcon fontSize="inherit" /> {post.likeCount.toLocaleString()}
+              </span>
+
+              <span>
+                <MouseIcon fontSize="inherit" /> {post.hitCount.toLocaleString()}
+              </span>
             </StatGroup>
           </InfoGroup2>
         </InfoStack>
       </MetaWrapper>
+      {post.thumbnailSrc && (
+        <Thumbnail src={post.thumbnailSrc} alt={post.title} width={100} height={100} placeholder="empty" />
+      )}
     </PostLink>
   )
 }

@@ -12,10 +12,12 @@ import { chatService } from '@/core/services/chat.service'
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess'
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore'
 
+const globalChatFolded = 'globalChatFolded'
+
 function GlobalChat() {
   const [messages, setMessages] = useState<ChatMessageDto[]>([])
   const [input, setInput] = useState('')
-  const [folded, setFolded] = useState(false)
+  const [folded, setFolded] = useState(localStorage.getItem(globalChatFolded) === 'true')
 
   const loginUser = useLoginUserStore((state) => state.loginUser)
   const ws = useRef<WebSocket | null>(null)
@@ -121,6 +123,7 @@ function GlobalChat() {
 
   const handleFoldToggle = useCallback(() => {
     setFolded((prev) => !prev)
+    localStorage.setItem(globalChatFolded, String(!folded))
     scrollToBottom()
   }, [folded, scrollToBottom])
 
@@ -169,11 +172,9 @@ function GlobalChat() {
   return (
     <GlobalChatRoot>
       <GlobalChatTop>
-        <Typography level="title-md" textColor={'#fefefe'}>
-          전체 채팅
-        </Typography>
+        <GlobalChatTitle>전체 채팅</GlobalChatTitle>
 
-        <IconButton data-joy-color-scheme="dark">
+        <IconButton size={'sm'} data-joy-color-scheme="dark">
           {folded ? <UnfoldMoreIcon onClick={handleFoldToggle} /> : <UnfoldLessIcon onClick={handleFoldToggle} />}
         </IconButton>
       </GlobalChatTop>
@@ -210,6 +211,8 @@ const GlobalChatRoot = styled('div')(({ theme }) => ({
   padding: theme.spacing(1),
   fontSize: '.9rem',
 
+  width: '100%',
+
   // 데스크탑 (md 이상)
   [theme.breakpoints.up('md')]: {
     width: '30rem',
@@ -221,6 +224,16 @@ const GlobalChatTop = styled('div')(({ theme }) => ({
   justifyContent: 'space-between',
   alignItems: 'center',
   paddingBottom: theme.spacing(0.8),
+}))
+
+const GlobalChatTitle = styled('span')(({ theme }) => ({
+  fontWeight: 'bold',
+  color: '#fefefe',
+
+  fontSize: '1rem',
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '.8rem',
+  },
 }))
 
 const GlobalChatInput = styled('input')(({ theme }) => ({
