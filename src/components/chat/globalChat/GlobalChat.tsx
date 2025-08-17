@@ -1,23 +1,25 @@
 'use client'
 
-import { ChatMessageDto } from '@/core/dto/chat/chat.dto'
+import { MessageDto } from '@/core/dto/chat/chat.dto'
 import useLoginUserStore from '@/store/useLoginUserStore'
-import { formatDateTime } from '@/utils/time.utils'
-import { Global } from '@emotion/react'
-import { IconButton, styled, Typography } from '@mui/joy'
+import { IconButton, styled } from '@mui/joy'
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import GlobalChatMessages from './GlobalChatMessages'
 import useApi from '@/hooks/useApi'
 import { chatService } from '@/core/services/chat.service'
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess'
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore'
+import ChatBubbleIcon from '@mui/icons-material/ChatOutlined'
+import MinimizeIcon from '@mui/icons-material/Minimize'
 
 const globalChatFolded = 'globalChatFolded'
+const globalChatMinimized = 'globalChatMinimized'
 
 function GlobalChat() {
-  const [messages, setMessages] = useState<ChatMessageDto[]>([])
+  const [messages, setMessages] = useState<MessageDto[]>([])
   const [input, setInput] = useState('')
   const [folded, setFolded] = useState(localStorage.getItem(globalChatFolded) === 'true')
+  const [minimized, setMinimized] = useState(localStorage.getItem(globalChatMinimized) === 'true')
 
   const loginUser = useLoginUserStore((state) => state.loginUser)
   const ws = useRef<WebSocket | null>(null)
@@ -30,10 +32,10 @@ function GlobalChat() {
 
   useApi({
     api: chatService.getMessages,
-    initalParams: new Date(),
     onSuccess: (data) => {
-      setMessages(data)
+      setMessages(data.reverse())
     },
+    initalParams: 0,
     executeImmediately: true,
   })
 
@@ -124,8 +126,12 @@ function GlobalChat() {
   const handleFoldToggle = useCallback(() => {
     setFolded((prev) => !prev)
     localStorage.setItem(globalChatFolded, String(!folded))
-    scrollToBottom()
   }, [folded, scrollToBottom])
+
+  const handleMinimizeToggle = useCallback(() => {
+    setMinimized((prev) => !prev)
+    localStorage.setItem(globalChatMinimized, String(!minimized))
+  }, [minimized, scrollToBottom])
 
   // 1. WebSocket 연결
   useEffect(() => {
@@ -148,16 +154,16 @@ function GlobalChat() {
     }
   }, [])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     // 스크롤을 항상 맨 아래로 유지
     if (isAtBottom()) {
       scrollToBottom()
     }
-  }, [messages])
+  }, [messages.length])
 
   useLayoutEffect(() => {
     scrollToBottom('auto')
-  }, [folded])
+  }, [folded, minimized])
 
   // 렌더 직후(레이아웃 계산 후) 한 번만 바닥으로
   useLayoutEffect(() => {
@@ -169,14 +175,19 @@ function GlobalChat() {
     didInitialScroll.current = true
   }, [messages.length])
 
-  return (
+  return !minimized ? (
     <GlobalChatRoot>
       <GlobalChatTop>
         <GlobalChatTitle>전체 채팅</GlobalChatTitle>
 
-        <IconButton size={'sm'} data-joy-color-scheme="dark">
-          {folded ? <UnfoldMoreIcon onClick={handleFoldToggle} /> : <UnfoldLessIcon onClick={handleFoldToggle} />}
-        </IconButton>
+        <div>
+          <IconButton size={'sm'} data-joy-color-scheme="dark">
+            {<MinimizeIcon onClick={handleMinimizeToggle} />}
+          </IconButton>
+          <IconButton size={'sm'} data-joy-color-scheme="dark" onClick={handleFoldToggle}>
+            {folded ? <UnfoldMoreIcon /> : <UnfoldLessIcon />}
+          </IconButton>
+        </div>
       </GlobalChatTop>
       <GlobalChatMessages
         messages={messages}
@@ -194,6 +205,10 @@ function GlobalChat() {
         onKeyDown={handleKeyDown}
       />
     </GlobalChatRoot>
+  ) : (
+    <GlobalChatBubble size="lg" variant="outlined" color="neutral" onClick={handleMinimizeToggle}>
+      <ChatBubbleIcon />
+    </GlobalChatBubble>
   )
 }
 
@@ -244,4 +259,10 @@ const GlobalChatInput = styled('input')(({ theme }) => ({
   outline: 'none',
   backgroundColor: 'white',
   borderRadius: '.3rem',
+}))
+
+const GlobalChatBubble = styled(IconButton)(({ theme }) => ({
+  position: 'fixed',
+  bottom: theme.spacing(2),
+  left: theme.spacing(1),
 }))

@@ -7,7 +7,7 @@ type UseApiProps<T, D> = {
   api: (params: T) => Promise<AxiosResponse<D>>
   onSuccess?: (data: D, params: T) => void
   onError?: (error: AxiosError) => void
-  onComplete?: () => void
+  onComplete?: (params: T) => void
   executeImmediately?: boolean
   initalParams?: T
   globalLoading?: boolean
@@ -49,7 +49,7 @@ export default function useApi<T, D>({
         return error
       })
       .finally(() => {
-        onComplete?.()
+        onComplete?.(params as T)
         setIsLoading(false)
         globalLoading && setGloabalLoading(false)
         setCompleted(true)

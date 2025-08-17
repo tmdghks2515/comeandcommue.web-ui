@@ -1,17 +1,17 @@
-import { ChatMessageDto } from '@/core/dto/chat/chat.dto'
+import { MessageDto } from '@/core/dto/chat/chat.dto'
 import { formatDateTime } from '@/utils/time.utils'
 import { styled } from '@mui/joy'
 import { memo, useCallback } from 'react'
 
 type Props = {
-  messages: ChatMessageDto[]
+  messages: MessageDto[]
   topRef: React.RefObject<HTMLDivElement | null>
   bottomRef: React.RefObject<HTMLDivElement | null>
   wrapperRef?: React.RefObject<HTMLDivElement | null>
   folded: boolean
 }
 
-const nicknameColors = [
+export const nicknameColors = [
   '#00ffa3', // 청록(기준색)
   '#ff4fa3', // 핑크
   '#ff6f4f', // 주황빛 레드
@@ -19,19 +19,16 @@ const nicknameColors = [
   '#ffe14f', // 옐로우
 ]
 
-function GlobalChatMessages({ messages, topRef, bottomRef, wrapperRef, folded }: Props) {
-  const getColorFromNickname = useCallback(
-    (nickname: string) => {
-      let hash = 0
-      for (let i = 0; i < nickname.length; i++) {
-        hash = nickname.charCodeAt(i) + ((hash << 5) - hash)
-      }
-      const index = Math.abs(hash) % nicknameColors.length
-      return nicknameColors[index]
-    },
-    [nicknameColors],
-  )
+export const getColorFromNickname = (nickname: string) => {
+  let hash = 0
+  for (let i = 0; i < nickname.length; i++) {
+    hash = nickname.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const index = Math.abs(hash) % nicknameColors.length
+  return nicknameColors[index]
+}
 
+function GlobalChatMessages({ messages, topRef, bottomRef, wrapperRef, folded }: Props) {
   return (
     <MessagesRoot ref={wrapperRef} folded={folded}>
       <div ref={topRef} />
@@ -42,7 +39,6 @@ function GlobalChatMessages({ messages, topRef, bottomRef, wrapperRef, folded }:
           <span>{msg.content}</span>
         </MessageItem>
       ))}
-      {/* 최하단 고정용 ref */}
       <div ref={bottomRef} />
     </MessagesRoot>
   )

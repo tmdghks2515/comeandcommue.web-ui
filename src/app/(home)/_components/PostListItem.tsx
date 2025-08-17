@@ -4,64 +4,130 @@ import CustomImage from '@/components/common/CustomImage'
 import { communityLabelMap } from '@/constants/post.constants'
 import { PostDto } from '@/core/dto/post/post.dto'
 import { formatRelativeTime } from '@/utils/time.utils'
-import { Chip, Stack, styled } from '@mui/joy'
+import { Button, Chip, IconButton, Stack, styled } from '@mui/joy'
 import ThumbUpIcon from '@mui/icons-material/ThumbUp'
-import MouseIcon from '@mui/icons-material/Mouse'
+import MouseOutlinedIcon from '@mui/icons-material/MouseOutlined'
 import React from 'react'
+import useApi from '@/hooks/useApi'
+import { postService } from '@/core/services/post.service'
+import ChatBubbleIcon from '@mui/icons-material/ChatOutlined'
+import PostComments from './PostComments'
 
-function PostListItem({ post }: { post: PostDto }) {
+function PostListItem({ post: postParam }: { post: PostDto }) {
+  const [post, setPost] = React.useState<PostDto>(postParam)
+  const [commentsOpen, setCommentsOpen] = React.useState(false)
+
+  const { execute: executeHitPost } = useApi({
+    api: postService.hitPost,
+    onSuccess: () => {
+      setPost((prev) => ({
+        ...prev,
+        hitCount: prev.hitCount + 1,
+      }))
+    },
+  })
+
+  const { execute: executeLikePost } = useApi({
+    api: postService.likePost,
+    onSuccess: (data) => {
+      setPost((prev) => ({
+        ...prev,
+        likeCount: data ? prev.likeCount + 1 : prev.likeCount - 1,
+      }))
+    },
+  })
+
+  const handleLikePost = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    executeLikePost(post.id)
+  }
+
+  const handleCommentPostToggle = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setCommentsOpen((prev) => !prev)
+  }
+
   return (
-    <PostLink href={post.linkHref} target="_blank" rel="noopener noreferrer">
-      <MetaWrapper spacing={1}>
-        <HeaderRow>
-          <Title>{post.title}</Title>
-        </HeaderRow>
-
-        <InfoStack>
-          <InfoGroup>
-            <Chip size="sm" color="primary">
-              {communityLabelMap[post.communityType]}
-            </Chip>
-            {post.authorName && (
-              <span>
-                <span className="text-gray-500">by </span>
-                {post.authorName}
-              </span>
+    <PostListItemRoot>
+      <PostLink href={post.linkHref} target="_blank" rel="noopener noreferrer" onClick={() => executeHitPost(post.id)}>
+        <MetaWrapper spacing={1}>
+          <HeaderRow>
+            <Title>{post.title}</Title>
+            {post.thumbnailSrc && (
+              <Thumbnail src={post.thumbnailSrc} alt={post.title} width={60} height={60} placeholder="empty" />
             )}
-          </InfoGroup>
+          </HeaderRow>
 
-          <InfoGroup2>
-            <span>{formatRelativeTime(new Date(post.createdAt))}</span>
-            <StatGroup>
-              <span>
-                <ThumbUpIcon fontSize="inherit" /> {post.likeCount.toLocaleString()}
-              </span>
+          <InfoStack>
+            <InfoGroup>
+              <Chip size="sm" color="primary">
+                {communityLabelMap[post.communityType]}
+              </Chip>
+              {post.authorName && (
+                <span>
+                  <span>by </span>
+                  {post.authorName}
+                </span>
+              )}
+            </InfoGroup>
 
-              <span>
-                <MouseIcon fontSize="inherit" /> {post.hitCount.toLocaleString()}
-              </span>
-            </StatGroup>
-          </InfoGroup2>
-        </InfoStack>
-      </MetaWrapper>
-      {post.thumbnailSrc && (
-        <Thumbnail src={post.thumbnailSrc} alt={post.title} width={100} height={100} placeholder="empty" />
-      )}
-    </PostLink>
+            <InfoGroup2>
+              <div>
+                <span>{formatRelativeTime(new Date(post.createdAt))}</span>
+                <span> · </span>
+                <span>
+                  <MouseOutlinedIcon fontSize="inherit" /> {post.hitCount.toLocaleString()}
+                </span>
+              </div>
+
+              <StatGroup>
+                <IconButton
+                  color={commentsOpen ? 'primary' : 'neutral'}
+                  variant="plain"
+                  onClick={(e) => handleCommentPostToggle(e)}
+                  size="sm"
+                >
+                  <ChatBubbleIcon />
+                </IconButton>
+                <Button
+                  size="sm"
+                  variant="plain"
+                  color="neutral"
+                  startDecorator={<ThumbUpIcon />}
+                  onClick={(e) => handleLikePost(e)}
+                >
+                  {post.likeCount.toLocaleString()}
+                </Button>
+              </StatGroup>
+            </InfoGroup2>
+          </InfoStack>
+        </MetaWrapper>
+      </PostLink>
+      {commentsOpen && <PostComments postId={post.id} />}
+    </PostListItemRoot>
   )
 }
 
 export default React.memo(PostListItem)
 
-const PostLink = styled('a')(({ theme }) => ({
+const PostListItemRoot = styled('div')(({ theme }) => ({
   flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+
+  [theme.breakpoints.up('lg')]: {
+    maxWidth: '48rem',
+  },
+}))
+
+const PostLink = styled('a')(({ theme }) => ({
   borderRadius: theme.radius.md,
   backgroundColor: theme.vars.palette.background.level1,
   '&:hover': {
     backgroundColor: theme.vars.palette.background.level2,
   },
-  display: 'flex',
-  flexDirection: 'row',
   textDecoration: 'none',
   color: 'inherit',
 }))
@@ -74,15 +140,16 @@ const Thumbnail = styled(CustomImage)({
 
 const MetaWrapper = styled(Stack)(({ theme }) => ({
   flex: 1,
-  minWidth: 0,
   justifyContent: 'space-between',
   paddingLeft: theme.spacing(1),
   paddingBlock: theme.spacing(1),
-  paddingRight: theme.spacing(1.5),
+  paddingRight: theme.spacing(1),
 }))
 
 const HeaderRow = styled('div')({
   marginBottom: 1,
+  display: 'flex',
+  justifyContent: 'space-between',
 })
 
 const Title = styled('div')(({ theme }) => ({
@@ -117,16 +184,17 @@ const InfoGroup2 = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: theme.spacing(0.5),
+
+  '& div:first-of-type': {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(1),
+  },
 }))
 
 const StatGroup = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: 8,
+  gap: 2,
   flexWrap: 'wrap',
-  color: theme.vars.palette.text.tertiary,
-  '& *': {
-    color: theme.vars.palette.text.tertiary,
-  },
 }))
