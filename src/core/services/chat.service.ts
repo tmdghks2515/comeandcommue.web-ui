@@ -9,4 +9,10 @@ export const chatService = {
         page,
       },
     }),
+  getPostComments: async ({ postId, page }: { postId: string; page: number }): Promise<AxiosResponse<MessageDto[]>> =>
+    await axiosInstance.get(`/chat/post/${postId}/comments`, {
+      params: {
+        page,
+      },
+    }),
 }

@@ -11,6 +11,7 @@ import UnfoldLessIcon from '@mui/icons-material/UnfoldLess'
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore'
 import ChatBubbleIcon from '@mui/icons-material/ChatOutlined'
 import MinimizeIcon from '@mui/icons-material/Minimize'
+import useGlobalWebSocketStore from '@/store/useGlobalWebSocketStore'
 
 const globalChatFolded = 'globalChatFolded'
 const globalChatMinimized = 'globalChatMinimized'
@@ -22,13 +23,16 @@ function GlobalChat() {
   const [minimized, setMinimized] = useState(localStorage.getItem(globalChatMinimized) === 'true')
 
   const loginUser = useLoginUserStore((state) => state.loginUser)
-  const ws = useRef<WebSocket | null>(null)
   const chatInputRef = useRef<HTMLInputElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const topRef = useRef<HTMLDivElement>(null)
   const messagesWrapperRef = useRef<HTMLDivElement>(null)
   // 초기 스크롤 수행 여부 가드
   const didInitialScroll = useRef(false)
+
+  const sendGlobalChat = useGlobalWebSocketStore((state) => state.send)
+  const addMessageListener = useGlobalWebSocketStore((state) => state.addMessageListener)
+  const removeMessageListener = useGlobalWebSocketStore((state) => state.removeMessageListener)
 
   useApi({
     api: chatService.getMessages,
@@ -44,22 +48,16 @@ function GlobalChat() {
     if (!input.trim()) {
       return
     }
-
-    if (ws.current?.readyState !== WebSocket.OPEN) {
-      console.warn('WebSocket is not open. Attempting to reconnect...')
-      socketConnect(() => sendMessage(), 3)
-      return
-    }
-
-    ws.current.send(
+    sendGlobalChat(
       JSON.stringify({
         content: input,
         senderNickname: loginUser.nickname,
         senderId: loginUser.id,
       }),
     )
+
     setInput('')
-  }, [input, loginUser.nickname, loginUser.id])
+  }, [input, sendGlobalChat, loginUser.nickname, loginUser.id])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -89,31 +87,6 @@ function GlobalChat() {
     [messagesWrapperRef],
   )
 
-  const socketConnect = useCallback((onOpen?: () => void, retry?: number) => {
-    if (ws.current?.readyState === WebSocket.OPEN) {
-      console.warn('WebSocket already connected')
-      return
-    }
-    ws.current = new WebSocket(`${process.env.NEXT_PUBLIC_WS_BASE_URL}/chat`)
-    ws.current.onopen = () => {
-      console.log('✅ WebSocket 연결 성공')
-      onOpen?.()
-    }
-    ws.current.onmessage = (event) => {
-      // console.log('📩 메시지 수신:', event.data)
-      setMessages((prev) => [...prev, JSON.parse(event.data)])
-    }
-    ws.current.onerror = (error) => {
-      console.error('❌ WebSocket 에러:', error)
-      if (retry) {
-        setTimeout(() => socketConnect(onOpen, retry - 1), 500)
-      }
-    }
-    ws.current.onclose = () => {
-      console.log('🔌 WebSocket 연결 종료')
-    }
-  }, [])
-
   const scrollToBottom = useCallback(
     (behavior: ScrollBehavior = 'smooth') => {
       if (bottomRef.current) {
@@ -133,10 +106,7 @@ function GlobalChat() {
     localStorage.setItem(globalChatMinimized, String(!minimized))
   }, [minimized, scrollToBottom])
 
-  // 1. WebSocket 연결
   useEffect(() => {
-    socketConnect(undefined, 3)
-
     // 엔터키 감지하여 입력 필드에 focus
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Enter' && !e.shiftKey) {
@@ -145,12 +115,17 @@ function GlobalChat() {
       }
     }
 
-    window.addEventListener('keydown', handleKeyDown)
+    const messageListener = (event: MessageEvent) => {
+      const message: MessageDto = JSON.parse(event.data)
+      setMessages((prev) => [...prev, message])
+    }
 
+    window.addEventListener('keydown', handleKeyDown)
+    addMessageListener(messageListener)
     // cleanup
     return () => {
-      ws.current?.close()
       window.removeEventListener('keydown', handleKeyDown)
+      removeMessageListener(messageListener)
     }
   }, [])
 
