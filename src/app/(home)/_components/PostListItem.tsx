@@ -33,6 +33,7 @@ function PostListItem({ post: postParam }: { post: PostDto }) {
       setPost((prev) => ({
         ...prev,
         likeCount: data ? prev.likeCount + 1 : prev.likeCount - 1,
+        liked: data,
       }))
     },
   })
@@ -94,7 +95,7 @@ function PostListItem({ post: postParam }: { post: PostDto }) {
                 <Button
                   size="sm"
                   variant="plain"
-                  color="neutral"
+                  color={post.liked ? 'primary' : 'neutral'}
                   startDecorator={<ThumbUpIcon />}
                   onClick={(e) => handleLikePost(e)}
                 >

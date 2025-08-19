@@ -107,24 +107,14 @@ function GlobalChat() {
   }, [minimized, scrollToBottom])
 
   useEffect(() => {
-    // 엔터키 감지하여 입력 필드에 focus
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault()
-        chatInputRef.current?.focus()
-      }
-    }
-
     const messageListener = (event: MessageEvent) => {
       const message: MessageDto = JSON.parse(event.data)
       setMessages((prev) => [...prev, message])
     }
 
-    window.addEventListener('keydown', handleKeyDown)
     addMessageListener(messageListener)
     // cleanup
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
       removeMessageListener(messageListener)
     }
   }, [])
@@ -176,7 +166,7 @@ function GlobalChat() {
         ref={chatInputRef}
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        placeholder="Enter를 눌러 메시지를 전송하세요"
+        placeholder="무슨 생각 하고 계세요?"
         onKeyDown={handleKeyDown}
       />
     </GlobalChatRoot>

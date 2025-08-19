@@ -101,7 +101,7 @@ const PostComments = ({ postId }: { postId: string }) => {
       <PostCommentInput
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        placeholder="의견 남기기"
+        placeholder="의견 남기기 .."
         onKeyDown={handleKeyDown}
       />
     </>

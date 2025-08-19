@@ -10,6 +10,7 @@ type PostDto = {
   likeCount: number
   hitCount: number
   communityType: CommunityType
+  liked: boolean
   postedAt: string // ISO date string
   createdAt: string // ISO date string
 }
