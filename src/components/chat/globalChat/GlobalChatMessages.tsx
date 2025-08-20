@@ -51,7 +51,7 @@ const MessagesRoot = styled('div')<{ folded: boolean }>(({ theme, folded }) => (
   flexGrow: 1,
   overflowY: 'auto',
   padding: theme.spacing(1),
-  maxHeight: folded ? '4vh' : '30vh',
+  maxHeight: folded ? '4vh' : '20vh',
 }))
 
 const MessageItem = styled('p')<{ nicknameColor: string }>(({ theme, nicknameColor }) => ({

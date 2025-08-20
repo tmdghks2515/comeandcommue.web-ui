@@ -12,6 +12,7 @@ import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore'
 import ChatBubbleIcon from '@mui/icons-material/ChatOutlined'
 import MinimizeIcon from '@mui/icons-material/Minimize'
 import useGlobalWebSocketStore from '@/store/useGlobalWebSocketStore'
+import SendIcon from '@mui/icons-material/Send'
 
 const globalChatFolded = 'globalChatFolded'
 const globalChatMinimized = 'globalChatMinimized'
@@ -99,12 +100,12 @@ function GlobalChat() {
   const handleFoldToggle = useCallback(() => {
     setFolded((prev) => !prev)
     localStorage.setItem(globalChatFolded, String(!folded))
-  }, [folded, scrollToBottom])
+  }, [folded])
 
   const handleMinimizeToggle = useCallback(() => {
     setMinimized((prev) => !prev)
     localStorage.setItem(globalChatMinimized, String(!minimized))
-  }, [minimized, scrollToBottom])
+  }, [minimized])
 
   useEffect(() => {
     const messageListener = (event: MessageEvent) => {
@@ -119,9 +120,13 @@ function GlobalChat() {
     }
   }, [])
 
+  // 스크롤 맨 아래 유지
   useLayoutEffect(() => {
-    // 스크롤을 항상 맨 아래로 유지
-    if (isAtBottom()) {
+    if (messages.length === 0) return
+    if (!didInitialScroll.current) {
+      scrollToBottom('auto')
+      didInitialScroll.current = true
+    } else if (isAtBottom()) {
       scrollToBottom()
     }
   }, [messages.length])
@@ -129,16 +134,6 @@ function GlobalChat() {
   useLayoutEffect(() => {
     scrollToBottom('auto')
   }, [folded, minimized])
-
-  // 렌더 직후(레이아웃 계산 후) 한 번만 바닥으로
-  useLayoutEffect(() => {
-    if (didInitialScroll.current) return
-    if (messages.length === 0) return
-
-    scrollToBottom('auto')
-
-    didInitialScroll.current = true
-  }, [messages.length])
 
   return !minimized ? (
     <GlobalChatRoot>
@@ -162,13 +157,18 @@ function GlobalChat() {
         folded={folded}
       />
 
-      <GlobalChatInput
-        ref={chatInputRef}
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="무슨 생각 하고 계세요?"
-        onKeyDown={handleKeyDown}
-      />
+      <GlobalChatInputWrapper>
+        <GlobalChatInput
+          ref={chatInputRef}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="무슨 생각 하고 계세요?"
+          onKeyDown={handleKeyDown}
+        />
+        <IconButton variant="soft" color="neutral" onClick={sendMessage}>
+          <SendIcon />
+        </IconButton>
+      </GlobalChatInputWrapper>
     </GlobalChatRoot>
   ) : (
     <GlobalChatBubble size="lg" variant="outlined" color="neutral" onClick={handleMinimizeToggle}>
@@ -214,6 +214,11 @@ const GlobalChatTitle = styled('span')(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     fontSize: '.8rem',
   },
+}))
+
+const GlobalChatInputWrapper = styled('div')(({ theme }) => ({
+  display: 'flex',
+  gap: theme.spacing(1),
 }))
 
 const GlobalChatInput = styled('input')(({ theme }) => ({

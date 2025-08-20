@@ -7,14 +7,16 @@ import useApi from '@/hooks/useApi'
 import useGlobalWebSocketStore from '@/store/useGlobalWebSocketStore'
 import useLoginUserStore from '@/store/useLoginUserStore'
 import { formatDateTime } from '@/utils/time.utils'
-import { styled } from '@mui/joy'
+import { IconButton, styled } from '@mui/joy'
 import React, { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
+import SendIcon from '@mui/icons-material/Send'
 
 const PostComments = ({ postId }: { postId: string }) => {
   const [comments, setComments] = React.useState<MessageDto[]>([])
   const [input, setInput] = React.useState('')
 
-  const bottomRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const didInitialScroll = useRef(false)
 
   const loginUser = useLoginUserStore((state) => state.loginUser)
   const sendPostComment = useGlobalWebSocketStore((state) => state.send)
@@ -60,34 +62,61 @@ const PostComments = ({ postId }: { postId: string }) => {
     [sendComment],
   )
 
-  const scrollToBottom = useCallback(
-    (behavior: ScrollBehavior = 'smooth') => {
-      // if (bottomRef.current) {
-      //   bottomRef.current.scrollIntoView({ behavior })
-      // }
+  const isAtBottom = useCallback(
+    (threshold = 180) => {
+      const wrapper = containerRef.current
+      if (!wrapper) return false
+
+      const { scrollHeight, clientHeight } = wrapper
+      // iOS 바운스 등으로 음수 방지
+      const scrollTop = Math.max(0, wrapper.scrollTop)
+
+      // 스크롤 불가능(내용이 짧음)하면 바닥으로 간주
+      if (scrollHeight <= clientHeight) return true
+
+      // '바닥에 충분히 가까운가?' 판정
+      return scrollTop + clientHeight >= scrollHeight - threshold
     },
-    [bottomRef],
+    [containerRef],
   )
+
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'auto') => {
+    const el = containerRef.current
+    if (!el) return
+    el.scrollTo({ top: el.scrollHeight, behavior })
+  }, [])
 
   useEffect(() => {
     const messageListener = (event: MessageEvent) => {
       const message = JSON.parse(event.data) as MessageDto
       setComments((prev) => [...prev, message])
-      scrollToBottom('auto')
     }
     addMessageListener(messageListener, 'POST_COMMENT', postId)
     return () => {
       removeMessageListener(messageListener)
     }
-  }, [addMessageListener, removeMessageListener, postId, scrollToBottom])
+  }, [addMessageListener, removeMessageListener, postId])
 
   useLayoutEffect(() => {
-    scrollToBottom('auto')
-  }, [comments])
+    if (comments.length === 0) return
+
+    if (!didInitialScroll.current) {
+      scrollToBottom('auto')
+      didInitialScroll.current = true
+      return
+    }
+
+    if (!isAtBottom()) return
+
+    // 다음 프레임에서 최신 scrollHeight 사용
+    requestAnimationFrame(() => {
+      scrollToBottom()
+    })
+  }, [comments.length, isAtBottom, scrollToBottom])
 
   return (
     <>
-      <MessagesRoot>
+      <MessagesRoot ref={containerRef}>
         {comments.map((msg, idx) => (
           <MessageItem key={idx} nicknameColor={getColorFromNickname(msg.senderNickname)}>
             <span>[{formatDateTime(msg.timestamp)}]</span>
@@ -96,14 +125,18 @@ const PostComments = ({ postId }: { postId: string }) => {
           </MessageItem>
         ))}
       </MessagesRoot>
-      <div ref={bottomRef} />
 
-      <PostCommentInput
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="의견 남기기 .."
-        onKeyDown={handleKeyDown}
-      />
+      <PostCommentInputWrapper>
+        <PostCommentInput
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="의견 남기기 .."
+          onKeyDown={handleKeyDown}
+        />
+        <IconButton variant="soft" color="neutral" onClick={sendComment}>
+          <SendIcon />
+        </IconButton>
+      </PostCommentInputWrapper>
     </>
   )
 }
@@ -111,12 +144,13 @@ const PostComments = ({ postId }: { postId: string }) => {
 export default React.memo(PostComments)
 
 const MessagesRoot = styled('div')(({ theme }) => ({
-  flex: 1,
-  flexGrow: 1,
+  flex: '1',
+  minHeight: '3vh',
+  maxHeight: '12vh',
   overflowY: 'auto',
   padding: theme.spacing(1),
-  maxHeight: '12vh',
   backgroundColor: 'rgba(0, 0, 0, 0.56)',
+  overscrollBehavior: 'contain',
 }))
 
 const MessageItem = styled('p')<{ nicknameColor: string }>(({ theme, nicknameColor }) => ({
@@ -143,4 +177,10 @@ const PostCommentInput = styled('input')(({ theme }) => ({
   outline: 'none',
   backgroundColor: 'white',
   borderRadius: '.3rem',
+  flex: 1,
+}))
+
+const PostCommentInputWrapper = styled('div')(({ theme }) => ({
+  display: 'flex',
+  gap: theme.spacing(1),
 }))

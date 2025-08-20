@@ -18,6 +18,7 @@ const theme = extendTheme({
           900: '#005c3f',
           // 글자에 직접 쓸 때 투명도 있는 버전 요청 반영
           plainColor: '#00ffa3e6',
+          solidColor: '#141517',
         },
 
         // 배경
@@ -31,7 +32,7 @@ const theme = extendTheme({
 
         // 텍스트
         text: {
-          primary: 'rgb(100% 100% 100%)', // 메인 텍스트
+          primary: 'fff', // 메인 텍스트
           secondary: '#dfe2ea', // 차등 텍스트
           tertiary: '#9da5b6', // 차차등 텍스트
         },
