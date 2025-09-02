@@ -1,6 +1,7 @@
+import { communityLabelMap } from '@/constants/post.constants'
 import { MessageDto } from '@/core/dto/chat/chat.dto'
 import { formatDateTime } from '@/utils/time.utils'
-import { styled } from '@mui/joy'
+import { Chip, styled } from '@mui/joy'
 import { memo, useCallback } from 'react'
 
 type Props = {
@@ -34,8 +35,13 @@ function GlobalChatMessages({ messages, topRef, bottomRef, wrapperRef, folded }:
       <div ref={topRef} />
       {messages.map((msg, idx) => (
         <MessageItem key={idx} nicknameColor={getColorFromNickname(msg.senderNickname)}>
-          <span>[{formatDateTime(msg.timestamp)}]</span>
+          <span>{formatDateTime(msg.timestamp)}</span>
           <span>{msg.senderNickname}</span>
+          {msg.messageType === 'POST_COMMENT' && msg.target ? (
+            <MessageItemTarget>
+              [{communityLabelMap[msg.target.communityType]}]{msg.target.title}
+            </MessageItemTarget>
+          ) : null}
           <span>{msg.content}</span>
         </MessageItem>
       ))}
@@ -66,5 +72,14 @@ const MessageItem = styled('p')<{ nicknameColor: string }>(({ theme, nicknameCol
   '& span:nth-of-type(2)': {
     fontWeight: 'bold',
     color: nicknameColor,
+  },
+}))
+
+const MessageItemTarget = styled('span')(({ theme }) => ({
+  fontStyle: 'italic',
+  color: '#a3a3a3',
+  '&:hover': {
+    // textDecoration: 'underline',
+    // cursor: 'pointer',
   },
 }))

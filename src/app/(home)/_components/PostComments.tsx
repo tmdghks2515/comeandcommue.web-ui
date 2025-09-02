@@ -10,8 +10,14 @@ import { formatDateTime } from '@/utils/time.utils'
 import { IconButton, styled } from '@mui/joy'
 import React, { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import SendIcon from '@mui/icons-material/Send'
+import { PostDto } from '@/core/dto/post/post.dto'
 
-const PostComments = ({ postId }: { postId: string }) => {
+type Props = {
+  post: PostDto
+  onCommented: () => void
+}
+
+const PostComments = ({ post, onCommented }: Props) => {
   const [comments, setComments] = React.useState<MessageDto[]>([])
   const [input, setInput] = React.useState('')
 
@@ -29,7 +35,7 @@ const PostComments = ({ postId }: { postId: string }) => {
       setComments(data.reverse())
     },
     initalParams: {
-      postId,
+      postId: post.id,
       page: 0,
     },
     executeImmediately: true,
@@ -45,12 +51,17 @@ const PostComments = ({ postId }: { postId: string }) => {
         senderNickname: loginUser.nickname,
         senderId: loginUser.id,
         messageType: 'POST_COMMENT',
-        targetId: postId,
+        targetId: post.id,
+        target: {
+          id: post.id,
+          communityType: post.communityType,
+          title: post.title,
+        },
       }),
     )
 
     setInput('')
-  }, [input, sendPostComment, loginUser.nickname, loginUser.id, postId])
+  }, [input, sendPostComment, loginUser.nickname, loginUser.id, post])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -88,14 +99,16 @@ const PostComments = ({ postId }: { postId: string }) => {
 
   useEffect(() => {
     const messageListener = (event: MessageEvent) => {
+      console.log('PostComments messageListener', event.data)
       const message = JSON.parse(event.data) as MessageDto
       setComments((prev) => [...prev, message])
+      onCommented()
     }
-    addMessageListener(messageListener, 'POST_COMMENT', postId)
+    addMessageListener(messageListener, 'POST_COMMENT', post.id)
     return () => {
       removeMessageListener(messageListener)
     }
-  }, [addMessageListener, removeMessageListener, postId])
+  }, [addMessageListener, removeMessageListener, post.id])
 
   useLayoutEffect(() => {
     if (comments.length === 0) return
@@ -119,7 +132,7 @@ const PostComments = ({ postId }: { postId: string }) => {
       <MessagesRoot ref={containerRef}>
         {comments.map((msg, idx) => (
           <MessageItem key={idx} nicknameColor={getColorFromNickname(msg.senderNickname)}>
-            <span>[{formatDateTime(msg.timestamp)}]</span>
+            <span>{formatDateTime(msg.timestamp)}</span>
             <span>{msg.senderNickname}</span>
             <span>{msg.content}</span>
           </MessageItem>

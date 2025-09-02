@@ -51,7 +51,7 @@ export const useGlobalWebSocketStore = create<GlobalWebSocket>((set, get) => ({
       for (const listener of Array.from(listeners)) {
         try {
           if (!listener.messageType || listener.messageType === message.messageType) {
-            if (!listener.targetId || listener.targetId === message.targetId) {
+            if (!listener.targetId || listener.targetId === message.target?.id) {
               listener(event)
             }
           }

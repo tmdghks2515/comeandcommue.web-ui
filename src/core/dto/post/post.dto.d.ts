@@ -9,6 +9,7 @@ type PostDto = {
   hasImg: boolean
   likeCount: number
   hitCount: number
+  commentCount: number
   communityType: CommunityType
   liked: boolean
   postedAt: string // ISO date string

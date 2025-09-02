@@ -50,6 +50,13 @@ function PostListItem({ post: postParam }: { post: PostDto }) {
     setCommentsOpen((prev) => !prev)
   }
 
+  const handleCommented = () => {
+    setPost((prev) => ({
+      ...prev,
+      commentCount: (prev.commentCount || 0) + 1,
+    }))
+  }
+
   return (
     <PostListItemRoot>
       <PostLink href={post.linkHref} target="_blank" rel="noopener noreferrer" onClick={() => executeHitPost(post.id)}>
@@ -84,14 +91,15 @@ function PostListItem({ post: postParam }: { post: PostDto }) {
               </div>
 
               <StatGroup>
-                <IconButton
+                <Button
                   color={commentsOpen ? 'primary' : 'neutral'}
                   variant="plain"
                   onClick={(e) => handleCommentPostToggle(e)}
                   size="sm"
+                  startDecorator={<ChatBubbleIcon />}
                 >
-                  <ChatBubbleIcon />
-                </IconButton>
+                  {post.commentCount?.toLocaleString() || 0}
+                </Button>
                 <Button
                   size="sm"
                   variant="plain"
@@ -99,14 +107,14 @@ function PostListItem({ post: postParam }: { post: PostDto }) {
                   startDecorator={<ThumbUpIcon />}
                   onClick={(e) => handleLikePost(e)}
                 >
-                  {post.likeCount.toLocaleString()}
+                  {post.likeCount?.toLocaleString() || 0}
                 </Button>
               </StatGroup>
             </InfoGroup2>
           </InfoStack>
         </MetaWrapper>
       </PostLink>
-      {commentsOpen && <PostComments postId={post.id} />}
+      {commentsOpen && <PostComments post={post} onCommented={handleCommented} />}
     </PostListItemRoot>
   )
 }

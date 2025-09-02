@@ -3,7 +3,7 @@ type MessageDto = {
   senderId: string
   senderNickname: string
   messageType: 'GLOBAL_CHAT' | 'POST_COMMENT'
-  targetId?: string
+  target?: Record<string, any>
   timestamp: Date
 }
 
