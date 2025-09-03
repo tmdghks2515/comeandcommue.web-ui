@@ -1,14 +1,37 @@
 'use client'
 
-import { Button, IconButton, styled, Typography, useColorScheme } from '@mui/joy'
-import WhatshotIcon from '@mui/icons-material/Whatshot'
+import { Dropdown, IconButton, Menu, MenuButton, MenuItem, styled, Typography, useColorScheme } from '@mui/joy'
 import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import useLoginUserStore from '@/store/useLoginUserStore'
+import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined'
+import useApi from '@/hooks/useApi'
+import { userService } from '@/core/services/user.service'
+import { useCallback, memo } from 'react'
 
-export default function MainHeader() {
+function MainHeader() {
   const { mode, setMode } = useColorScheme()
-  const loginUser = useLoginUserStore((state) => state.loginUser)
+  const { loginUser, setLoginUser } = useLoginUserStore()
+
+  const { execute: executeChangeNickname } = useApi({
+    api: userService.changeNickname,
+    onSuccess: (data) => {
+      setLoginUser(data)
+    },
+    onError: (error) => {
+      alert(error)
+      // alert(error.response?.data?.message || '닉네임 변경에 실패했습니다. 잠시 후 다시 시도해주세요.')
+    },
+  })
+
+  const handleChangeNickname = useCallback(() => {
+    /* if (loginUser.dailyNicknameChangeRemain <= 0) {
+      alert('오늘 닉네임 변경 가능 횟수를 모두 사용했습니다. 내일 다시 시도해주세요.')
+      return
+    } */
+
+    executeChangeNickname()
+  }, [executeChangeNickname, loginUser.dailyNicknameChangeRemain])
 
   return (
     <HeaderRoot>
@@ -17,20 +40,30 @@ export default function MainHeader() {
       </HeaderPart1>
 
       <HeaderPart2>
-        <Button startDecorator={<WhatshotIcon />} variant="plain" color="neutral" size="sm">
+        {/* <Button startDecorator={<WhatshotIcon />} variant="plain" color="neutral" size="sm">
           Hot
-        </Button>
+        </Button> */}
       </HeaderPart2>
 
       <HeaderPart3>
         <IconButton onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}>
           {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
         </IconButton>
-        <Nickname>{loginUser?.nickname}</Nickname>
+
+        <Dropdown>
+          <MenuButton variant="plain" size="sm" endDecorator={<ArrowDropDownOutlinedIcon />}>
+            {loginUser?.nickname}
+          </MenuButton>
+          <Menu placement="bottom-end" size="sm" onClick={handleChangeNickname}>
+            <MenuItem>닉네임 변경 ({loginUser.dailyNicknameChangeRemain || 0}/3)</MenuItem>
+          </Menu>
+        </Dropdown>
       </HeaderPart3>
     </HeaderRoot>
   )
 }
+
+export default memo(MainHeader)
 
 const HeaderRoot = styled('header')(({ theme }) => ({
   padding: `${theme.spacing(2)} ${theme.spacing(1)}`,
@@ -57,17 +90,12 @@ const HeaderPart2 = styled('div')({
 const HeaderPart3 = styled('div')({
   display: 'flex',
   alignItems: 'center',
-  gap: 8,
+  gap: 2,
 })
 
 const Title = styled(Typography)(({ theme }) => ({
   fontWeight: 'bold',
   fontSize: '1.5rem',
   marginRight: theme.spacing(4),
-}))
-
-const Nickname = styled('span')(({ theme }) => ({
-  color: theme.palette.text.secondary,
-  fontSize: '.8rem',
-  fontWeight: theme.fontWeight.lg,
+  paddingLeft: theme.spacing(1),
 }))

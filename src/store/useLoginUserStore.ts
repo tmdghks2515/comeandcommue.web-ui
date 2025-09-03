@@ -9,7 +9,8 @@ type LoginUser = {
 const useLoginUserStore = create<LoginUser>((set) => ({
   loginUser: {
     id: 'unknown',
-    nickname: '알수없는사용자',
+    nickname: '',
+    dailyNicknameChangeRemain: 3,
     createdAt: new Date(),
   },
   setLoginUser: (loginUser: UserDto) => set({ loginUser }),
