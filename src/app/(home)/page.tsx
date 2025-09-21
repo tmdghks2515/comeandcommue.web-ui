@@ -73,9 +73,9 @@ export default function Home() {
 
       <div ref={sentinelRef} style={{ height: '1px' }} />
       {fetching && (
-        <p style={{ textAlign: 'center' }}>
+        <LoadingContainer>
           <CircularProgress size="sm" />
-        </p>
+        </LoadingContainer>
       )}
     </Container>
   )
@@ -94,3 +94,9 @@ const PostList = styled(List)(({ theme }) => ({
   flexDirection: 'column',
   gap: theme.spacing(1.5),
 }))
+
+const LoadingContainer = styled('div')({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+})

@@ -1,7 +1,7 @@
 import { communityLabelMap } from '@/constants/post.constants'
 import { MessageDto } from '@/core/dto/chat/chat.dto'
 import { formatDateTime } from '@/utils/time.utils'
-import { Chip, styled } from '@mui/joy'
+import { Chip, ListItem, styled } from '@mui/joy'
 import { memo, useCallback } from 'react'
 
 type Props = {
@@ -35,16 +35,18 @@ function GlobalChatMessages({ messages, topRef, bottomRef, wrapperRef, folded, o
     <MessagesRoot ref={wrapperRef} folded={folded}>
       <div ref={topRef} />
       {messages.map((msg, idx) => (
-        <MessageItem key={idx} nicknameColor={getColorFromNickname(msg.senderNickname)}>
-          <span>{formatDateTime(msg.timestamp)}</span>
-          <span>{msg.senderNickname}</span>
-          {msg.messageType === 'POST_COMMENT' && msg.target ? (
-            <MessageItemTarget onClick={() => onClickPostTarget(msg.target!.id)}>
-              [{communityLabelMap[msg.target.communityType]}]{msg.target.title}
-            </MessageItemTarget>
-          ) : null}
-          <span>{msg.content}</span>
-        </MessageItem>
+        <ListItem key={idx} sx={{ padding: 0 }}>
+          <MessageItem nicknameColor={getColorFromNickname(msg.senderNickname)}>
+            <span>{formatDateTime(msg.timestamp)}</span>
+            <span>{msg.senderNickname}</span>
+            {msg.messageType === 'POST_COMMENT' && msg.target ? (
+              <MessageItemTarget onClick={() => onClickPostTarget(msg.target!.id)}>
+                [{communityLabelMap[msg.target.communityType]}]{msg.target.title}
+              </MessageItemTarget>
+            ) : null}
+            <span>{msg.content}</span>
+          </MessageItem>
+        </ListItem>
       ))}
       <div ref={bottomRef} />
     </MessagesRoot>

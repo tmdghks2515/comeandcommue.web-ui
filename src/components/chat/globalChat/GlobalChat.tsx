@@ -2,7 +2,7 @@
 
 import { MessageDto } from '@/core/dto/chat/chat.dto'
 import useLoginUserStore from '@/store/useLoginUserStore'
-import { IconButton, styled } from '@mui/joy'
+import { Box, IconButton, styled } from '@mui/joy'
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import GlobalChatMessages from './GlobalChatMessages'
 import useApi from '@/hooks/useApi'
@@ -14,6 +14,7 @@ import MinimizeIcon from '@mui/icons-material/Minimize'
 import useGlobalWebSocketStore from '@/store/useGlobalWebSocketStore'
 import SendIcon from '@mui/icons-material/Send'
 import PostCommentsModal from './PostCommentsModal'
+import ScrollTopButton from '@/components/common/ScrollTopButton'
 
 const globalChatFolded = 'globalChatFolded'
 const globalChatMinimized = 'globalChatMinimized'
@@ -139,47 +140,54 @@ function GlobalChat() {
 
   return (
     <>
-      {!minimized ? (
-        <GlobalChatRoot>
-          <GlobalChatTop>
-            <GlobalChatTitle>전체 채팅</GlobalChatTitle>
+      <GlobalChatRoot>
+        {/* scroll top 버튼 */}
+        <ScrollTopButtonContainer>
+          <ScrollTopButton />
+        </ScrollTopButtonContainer>
 
-            <div>
-              <IconButton size={'sm'} data-joy-color-scheme="dark">
-                {<MinimizeIcon onClick={handleMinimizeToggle} />}
-              </IconButton>
-              <IconButton size={'sm'} data-joy-color-scheme="dark" onClick={handleFoldToggle}>
-                {folded ? <UnfoldMoreIcon /> : <UnfoldLessIcon />}
-              </IconButton>
-            </div>
-          </GlobalChatTop>
-          <GlobalChatMessages
-            onClickPostTarget={setPostCommentsModalPostId}
-            messages={messages}
-            topRef={topRef}
-            bottomRef={bottomRef}
-            wrapperRef={messagesWrapperRef}
-            folded={folded}
-          />
+        {minimized ? (
+          <GlobalChatBubble size="lg" variant="outlined" color="neutral" onClick={handleMinimizeToggle}>
+            <ChatBubbleIcon />
+          </GlobalChatBubble>
+        ) : (
+          <GlobalChatContainer>
+            <GlobalChatTop>
+              <GlobalChatTitle>전체 채팅</GlobalChatTitle>
 
-          <GlobalChatInputWrapper>
-            <GlobalChatInput
-              ref={chatInputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="무슨 생각 하고 계세요?"
-              onKeyDown={handleKeyDown}
+              <div>
+                <IconButton size={'sm'} data-joy-color-scheme="dark">
+                  {<MinimizeIcon onClick={handleMinimizeToggle} />}
+                </IconButton>
+                <IconButton size={'sm'} data-joy-color-scheme="dark" onClick={handleFoldToggle}>
+                  {folded ? <UnfoldMoreIcon /> : <UnfoldLessIcon />}
+                </IconButton>
+              </div>
+            </GlobalChatTop>
+            <GlobalChatMessages
+              onClickPostTarget={setPostCommentsModalPostId}
+              messages={messages}
+              topRef={topRef}
+              bottomRef={bottomRef}
+              wrapperRef={messagesWrapperRef}
+              folded={folded}
             />
-            <IconButton variant="soft" color="neutral" onClick={sendMessage}>
-              <SendIcon />
-            </IconButton>
-          </GlobalChatInputWrapper>
-        </GlobalChatRoot>
-      ) : (
-        <GlobalChatBubble size="lg" variant="outlined" color="neutral" onClick={handleMinimizeToggle}>
-          <ChatBubbleIcon />
-        </GlobalChatBubble>
-      )}
+
+            <GlobalChatInputWrapper>
+              <GlobalChatInput
+                ref={chatInputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="무슨 생각 하고 계세요?"
+                onKeyDown={handleKeyDown}
+              />
+              <IconButton variant="soft" color="neutral" onClick={sendMessage}>
+                <SendIcon />
+              </IconButton>
+            </GlobalChatInputWrapper>
+          </GlobalChatContainer>
+        )}
+      </GlobalChatRoot>
 
       <PostCommentsModal postId={postCommentsModalPostId} onClose={() => setPostCommentsModalPostId(undefined)} />
     </>
@@ -188,17 +196,33 @@ function GlobalChat() {
 
 export default memo(GlobalChat)
 
+const ScrollTopButtonContainer = styled('div')(({ theme }) => ({
+  [theme.breakpoints.down('md')]: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    paddingBottom: theme.spacing(1),
+    paddingRight: theme.spacing(1),
+  },
+
+  [theme.breakpoints.up('md')]: {
+    position: 'fixed',
+    bottom: theme.spacing(2),
+    right: theme.spacing(2),
+  },
+
+  [theme.breakpoints.up('lg')]: {
+    position: 'fixed',
+    bottom: theme.spacing(2),
+    right: '25%',
+  },
+
+  zIndex: 1000,
+}))
+
 const GlobalChatRoot = styled('div')(({ theme }) => ({
   position: 'fixed',
   bottom: 0,
   left: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  backgroundColor: 'rgba(0, 0, 0, 0.56)',
-
-  borderRadius: '.3rem',
-  padding: theme.spacing(1),
-  fontSize: '.9rem',
 
   width: '100%',
 
@@ -206,6 +230,16 @@ const GlobalChatRoot = styled('div')(({ theme }) => ({
   [theme.breakpoints.up('md')]: {
     width: '30rem',
   },
+}))
+
+const GlobalChatContainer = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  backgroundColor: 'rgba(0, 0, 0, 0.56)',
+
+  borderRadius: '.3rem',
+  padding: theme.spacing(1),
+  fontSize: '.9rem',
 }))
 
 const GlobalChatTop = styled('div')(({ theme }) => ({
@@ -242,6 +276,6 @@ const GlobalChatInput = styled('input')(({ theme }) => ({
 
 const GlobalChatBubble = styled(IconButton)(({ theme }) => ({
   position: 'fixed',
-  bottom: theme.spacing(2),
+  bottom: theme.spacing(1),
   left: theme.spacing(1),
 }))
