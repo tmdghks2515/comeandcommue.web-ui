@@ -4,7 +4,7 @@ interface UseInfiniteScrollProps {
   targetRef: React.RefObject<HTMLElement | null>
   onLoadMore: () => void
   hasNextPage: boolean
-  isFetching: boolean
+  fetching: boolean
   rootMargin?: string
 }
 
@@ -12,7 +12,7 @@ export default function useInfiniteScroll({
   targetRef,
   onLoadMore,
   hasNextPage,
-  isFetching,
+  fetching: isFetching,
   rootMargin = '100px',
 }: UseInfiniteScrollProps) {
   useEffect(() => {

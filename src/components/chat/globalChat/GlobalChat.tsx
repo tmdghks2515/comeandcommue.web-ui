@@ -13,6 +13,7 @@ import ChatBubbleIcon from '@mui/icons-material/ChatOutlined'
 import MinimizeIcon from '@mui/icons-material/Minimize'
 import useGlobalWebSocketStore from '@/store/useGlobalWebSocketStore'
 import SendIcon from '@mui/icons-material/Send'
+import PostCommentsModal from './PostCommentsModal'
 
 const globalChatFolded = 'globalChatFolded'
 const globalChatMinimized = 'globalChatMinimized'
@@ -22,6 +23,7 @@ function GlobalChat() {
   const [input, setInput] = useState('')
   const [folded, setFolded] = useState(localStorage.getItem(globalChatFolded) === 'true')
   const [minimized, setMinimized] = useState(localStorage.getItem(globalChatMinimized) === 'true')
+  const [postCommentsModalPostId, setPostCommentsModalPostId] = useState<string>()
 
   const loginUser = useLoginUserStore((state) => state.loginUser)
   const chatInputRef = useRef<HTMLInputElement>(null)
@@ -135,45 +137,52 @@ function GlobalChat() {
     scrollToBottom('auto')
   }, [folded, minimized])
 
-  return !minimized ? (
-    <GlobalChatRoot>
-      <GlobalChatTop>
-        <GlobalChatTitle>전체 채팅</GlobalChatTitle>
+  return (
+    <>
+      {!minimized ? (
+        <GlobalChatRoot>
+          <GlobalChatTop>
+            <GlobalChatTitle>전체 채팅</GlobalChatTitle>
 
-        <div>
-          <IconButton size={'sm'} data-joy-color-scheme="dark">
-            {<MinimizeIcon onClick={handleMinimizeToggle} />}
-          </IconButton>
-          <IconButton size={'sm'} data-joy-color-scheme="dark" onClick={handleFoldToggle}>
-            {folded ? <UnfoldMoreIcon /> : <UnfoldLessIcon />}
-          </IconButton>
-        </div>
-      </GlobalChatTop>
-      <GlobalChatMessages
-        messages={messages}
-        topRef={topRef}
-        bottomRef={bottomRef}
-        wrapperRef={messagesWrapperRef}
-        folded={folded}
-      />
+            <div>
+              <IconButton size={'sm'} data-joy-color-scheme="dark">
+                {<MinimizeIcon onClick={handleMinimizeToggle} />}
+              </IconButton>
+              <IconButton size={'sm'} data-joy-color-scheme="dark" onClick={handleFoldToggle}>
+                {folded ? <UnfoldMoreIcon /> : <UnfoldLessIcon />}
+              </IconButton>
+            </div>
+          </GlobalChatTop>
+          <GlobalChatMessages
+            onClickPostTarget={setPostCommentsModalPostId}
+            messages={messages}
+            topRef={topRef}
+            bottomRef={bottomRef}
+            wrapperRef={messagesWrapperRef}
+            folded={folded}
+          />
 
-      <GlobalChatInputWrapper>
-        <GlobalChatInput
-          ref={chatInputRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="무슨 생각 하고 계세요?"
-          onKeyDown={handleKeyDown}
-        />
-        <IconButton variant="soft" color="neutral" onClick={sendMessage}>
-          <SendIcon />
-        </IconButton>
-      </GlobalChatInputWrapper>
-    </GlobalChatRoot>
-  ) : (
-    <GlobalChatBubble size="lg" variant="outlined" color="neutral" onClick={handleMinimizeToggle}>
-      <ChatBubbleIcon />
-    </GlobalChatBubble>
+          <GlobalChatInputWrapper>
+            <GlobalChatInput
+              ref={chatInputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="무슨 생각 하고 계세요?"
+              onKeyDown={handleKeyDown}
+            />
+            <IconButton variant="soft" color="neutral" onClick={sendMessage}>
+              <SendIcon />
+            </IconButton>
+          </GlobalChatInputWrapper>
+        </GlobalChatRoot>
+      ) : (
+        <GlobalChatBubble size="lg" variant="outlined" color="neutral" onClick={handleMinimizeToggle}>
+          <ChatBubbleIcon />
+        </GlobalChatBubble>
+      )}
+
+      <PostCommentsModal postId={postCommentsModalPostId} onClose={() => setPostCommentsModalPostId(undefined)} />
+    </>
   )
 }
 

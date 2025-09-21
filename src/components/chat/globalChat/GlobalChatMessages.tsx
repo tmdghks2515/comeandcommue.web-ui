@@ -10,6 +10,7 @@ type Props = {
   bottomRef: React.RefObject<HTMLDivElement | null>
   wrapperRef?: React.RefObject<HTMLDivElement | null>
   folded: boolean
+  onClickPostTarget: (postId: string) => void
 }
 
 export const nicknameColors = [
@@ -29,7 +30,7 @@ export const getColorFromNickname = (nickname: string) => {
   return nicknameColors[index]
 }
 
-function GlobalChatMessages({ messages, topRef, bottomRef, wrapperRef, folded }: Props) {
+function GlobalChatMessages({ messages, topRef, bottomRef, wrapperRef, folded, onClickPostTarget }: Props) {
   return (
     <MessagesRoot ref={wrapperRef} folded={folded}>
       <div ref={topRef} />
@@ -38,7 +39,7 @@ function GlobalChatMessages({ messages, topRef, bottomRef, wrapperRef, folded }:
           <span>{formatDateTime(msg.timestamp)}</span>
           <span>{msg.senderNickname}</span>
           {msg.messageType === 'POST_COMMENT' && msg.target ? (
-            <MessageItemTarget>
+            <MessageItemTarget onClick={() => onClickPostTarget(msg.target!.id)}>
               [{communityLabelMap[msg.target.communityType]}]{msg.target.title}
             </MessageItemTarget>
           ) : null}
@@ -79,7 +80,7 @@ const MessageItemTarget = styled('span')(({ theme }) => ({
   fontStyle: 'italic',
   color: '#a3a3a3',
   '&:hover': {
-    // textDecoration: 'underline',
-    // cursor: 'pointer',
+    textDecoration: 'underline',
+    cursor: 'pointer',
   },
 }))

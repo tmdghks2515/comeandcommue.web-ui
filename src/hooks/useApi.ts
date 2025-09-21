@@ -22,15 +22,15 @@ export default function useApi<T, D>({
   initalParams,
   globalLoading,
 }: UseApiProps<T, D>) {
-  const [isLoading, setIsLoading] = useState(false)
+  const [loading, setIsLoading] = useState(false)
   const [data, setData] = useState<D>()
   const [completed, setCompleted] = useState(false)
 
-  const { openSnackbar } = useSnackbar()
+  const { showSnackbar } = useSnackbar()
   const setGloabalLoading = useGlobalLoading((state) => state.setLoading)
 
   const execute = async (params?: T) => {
-    if (isLoading) return
+    if (loading) return
     setIsLoading(true)
     globalLoading && setGloabalLoading(true)
     return api(params as T)
@@ -42,7 +42,7 @@ export default function useApi<T, D>({
       .catch((error) => {
         onError?.(error)
         error?.response?.data?.message &&
-          openSnackbar({
+          showSnackbar({
             message: error?.response?.data?.message,
             variant: 'danger',
           })
@@ -62,7 +62,7 @@ export default function useApi<T, D>({
 
   return {
     execute,
-    isLoading,
+    loading,
     data,
     completed,
   }

@@ -2,7 +2,7 @@
 
 import { postQueryService } from '@/core/services/post.query.service'
 import useApi from '@/hooks/useApi'
-import { List, ListItem, Sheet, styled, useColorScheme } from '@mui/joy'
+import { CircularProgress, List, ListItem, Sheet, styled, useColorScheme } from '@mui/joy'
 import { useEffect, useRef, useState } from 'react'
 import CommuFilterChips from './_components/CommuFilterChips'
 import { PostDto } from '@/core/dto/post/post.dto'
@@ -16,7 +16,7 @@ const pageSize = 50
 export default function Home() {
   const [posts, setPosts] = useState<PostDto[]>([])
   const [lastCreatedAt, setLastCreatedAt] = useState<string>()
-  const [isFetching, setIsFetching] = useState(false)
+  const [fetching, setIsFetching] = useState(false)
   const [hasNextPage, setHasNextPage] = useState(true)
 
   const selectedCommunities = useCommuFilterStore((state) => state.selected)
@@ -42,7 +42,7 @@ export default function Home() {
     targetRef: sentinelRef,
     onLoadMore: () => setLastCreatedAt(posts?.[posts.length - 1]?.createdAt),
     hasNextPage,
-    isFetching,
+    fetching,
   })
 
   useEffect(() => {
@@ -72,7 +72,11 @@ export default function Home() {
       </PostList>
 
       <div ref={sentinelRef} style={{ height: '1px' }} />
-      {isFetching && <p style={{ textAlign: 'center' }}>로딩 중...</p>}
+      {fetching && (
+        <p style={{ textAlign: 'center' }}>
+          <CircularProgress size="sm" />
+        </p>
+      )}
     </Container>
   )
 }

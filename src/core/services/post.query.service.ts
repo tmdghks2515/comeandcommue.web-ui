@@ -8,4 +8,6 @@ export const postQueryService = {
     await axiosInstance.get<PostDto[]>('/post/query/recent', {
       params,
     }),
+  getPost: async (postId: string): Promise<AxiosResponse<PostDto>> =>
+    await axiosInstance.get<PostDto>(`/post/query/${postId}`),
 }

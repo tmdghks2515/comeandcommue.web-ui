@@ -31,7 +31,7 @@ export default function SnackbarProvider() {
     <Snackbar
       open={open}
       onClose={handleClose}
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       autoHideDuration={3000}
       variant="soft"
       color={variant}

@@ -10,7 +10,6 @@ const useLoginUserStore = create<LoginUser>((set) => ({
   loginUser: {
     id: 'unknown',
     nickname: '',
-    dailyNicknameChangeRemain: 3,
     createdAt: new Date(),
   },
   setLoginUser: (loginUser: UserDto) => set({ loginUser }),

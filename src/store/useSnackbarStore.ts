@@ -10,7 +10,7 @@ type SnackbarProps = {
 
 type SnackbarStore = {
   snackbarProps: SnackbarProps
-  openSnackbar: (props: Omit<SnackbarProps, 'open'>) => void
+  showSnackbar: (props: Omit<SnackbarProps, 'open'>) => void
 }
 
 const useSnackbarStore = create<SnackbarStore>((set) => ({
@@ -18,7 +18,7 @@ const useSnackbarStore = create<SnackbarStore>((set) => ({
     open: false,
     message: '',
   },
-  openSnackbar: (props) =>
+  showSnackbar: (props) =>
     set(() => ({
       snackbarProps: {
         open: true,

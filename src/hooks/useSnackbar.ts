@@ -1,10 +1,10 @@
 import useSnackbarStore from '@/store/useSnackbarStore'
 
 const useSnackbar = () => {
-  const openSnackbar = useSnackbarStore((state) => state.openSnackbar)
+  const showSnackbar = useSnackbarStore((state) => state.showSnackbar)
 
   return {
-    openSnackbar,
+    showSnackbar,
   }
 }
 

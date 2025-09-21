@@ -18,20 +18,11 @@ function MainHeader() {
     onSuccess: (data) => {
       setLoginUser(data)
     },
-    onError: (error) => {
-      alert(error)
-      // alert(error.response?.data?.message || '닉네임 변경에 실패했습니다. 잠시 후 다시 시도해주세요.')
-    },
   })
 
   const handleChangeNickname = useCallback(() => {
-    /* if (loginUser.dailyNicknameChangeRemain <= 0) {
-      alert('오늘 닉네임 변경 가능 횟수를 모두 사용했습니다. 내일 다시 시도해주세요.')
-      return
-    } */
-
     executeChangeNickname()
-  }, [executeChangeNickname, loginUser.dailyNicknameChangeRemain])
+  }, [executeChangeNickname])
 
   return (
     <HeaderRoot>
@@ -55,7 +46,7 @@ function MainHeader() {
             {loginUser?.nickname}
           </MenuButton>
           <Menu placement="bottom-end" size="sm" onClick={handleChangeNickname}>
-            <MenuItem>닉네임 변경 ({loginUser.dailyNicknameChangeRemain || 0}/3)</MenuItem>
+            <MenuItem>닉네임 변경</MenuItem>
           </Menu>
         </Dropdown>
       </HeaderPart3>
