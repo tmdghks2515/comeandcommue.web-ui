@@ -29,7 +29,7 @@ function NewPostsNotice({ createdAtTo, communityTypes, onClick }: Props) {
 
   usePolling({
     fn: executeCountNewPosts,
-    interval: 3000,
+    interval: 60000,
     enabled: !!createdAtTo,
   })
 
