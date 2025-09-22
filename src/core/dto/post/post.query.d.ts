@@ -1,7 +1,13 @@
 type RecentPostsQuery = {
   communityTypes: CommunityType[]
   pageSize: number
-  lastCreatedAt?: string
+  createdAtFrom?: Date
+  createdAtTo?: Date
 }
 
-export type { RecentPostsQuery }
+type CountNewPostsQuery = {
+  communityTypes: CommunityType[]
+  createdAtTo: Date
+}
+
+export type { RecentPostsQuery, CountNewPostsQuery }

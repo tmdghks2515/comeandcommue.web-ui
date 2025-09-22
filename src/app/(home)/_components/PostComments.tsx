@@ -38,7 +38,7 @@ const PostComments = ({ post, onCommented }: Props) => {
       postId: post.id,
       page: 0,
     },
-    executeImmediately: true,
+    immediate: true,
   })
 
   const sendComment = useCallback(() => {

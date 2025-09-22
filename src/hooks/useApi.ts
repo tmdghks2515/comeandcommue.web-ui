@@ -8,7 +8,7 @@ type UseApiProps<T, D> = {
   onSuccess?: (data: D, params: T) => void
   onError?: (error: AxiosError) => void
   onComplete?: (params: T) => void
-  executeImmediately?: boolean
+  immediate?: boolean
   initalParams?: T
   globalLoading?: boolean
 }
@@ -18,7 +18,7 @@ export default function useApi<T, D>({
   onSuccess,
   onError,
   onComplete,
-  executeImmediately,
+  immediate,
   initalParams,
   globalLoading,
 }: UseApiProps<T, D>) {
@@ -57,13 +57,14 @@ export default function useApi<T, D>({
   }
 
   useEffect(() => {
-    executeImmediately && execute(initalParams)
-  }, [executeImmediately])
+    immediate && execute(initalParams)
+  }, [immediate])
 
   return {
     execute,
     loading,
     data,
+    setData,
     completed,
   }
 }

@@ -125,10 +125,6 @@ const PostListItemRoot = styled('div')(({ theme }) => ({
   flex: 1,
   display: 'flex',
   flexDirection: 'column',
-
-  [theme.breakpoints.up('lg')]: {
-    maxWidth: '48rem',
-  },
 }))
 
 const PostLink = styled('a')(({ theme }) => ({

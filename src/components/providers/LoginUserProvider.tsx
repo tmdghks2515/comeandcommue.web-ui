@@ -24,7 +24,7 @@ export default function LoginUserProvider() {
     onError: () => {
       executeCreateUser()
     },
-    executeImmediately: true,
+    immediate: true,
   })
 
   return <></>

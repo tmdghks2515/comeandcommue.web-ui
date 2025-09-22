@@ -2,16 +2,16 @@
 
 import { IconButton, styled } from '@mui/joy'
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import useThrottle from '@/hooks/useThrottle'
 
 export default function ScrollTopButton() {
   const [scrollY, setScrollY] = useState(0)
   const throttledScrollY = useThrottle(scrollY, 150) // 150ms 단위로 갱신
 
-  const handleScrollTop = () => {
+  const handleScrollTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {

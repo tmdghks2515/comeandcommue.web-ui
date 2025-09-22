@@ -21,6 +21,21 @@ const theme = extendTheme({
           solidColor: '#141517',
         },
 
+        // 보조 색
+        secondary: {
+          50: '#EDF5FD',
+          100: '#E3EFFB',
+          200: '#C7DFF7',
+          300: '#97C3F0',
+          400: '#4393E4',
+          500: '#0B6BCB',
+          600: '#185EA5',
+          700: '#12467B',
+          800: '#0A2744',
+          900: '#051423',
+          plainColor: '#0B6BCB',
+        },
+
         // 배경
         background: {
           body: '#141517', // 기본 배경
@@ -59,6 +74,21 @@ const theme = extendTheme({
           800: '#0f7148',
           900: '#0a5b3a',
           plainColor: '#1bb373',
+        },
+
+        // 보조 색
+        secondary: {
+          50: '#EDF5FD',
+          100: '#E3EFFB',
+          200: '#C7DFF7',
+          300: '#97C3F0',
+          400: '#4393E4',
+          500: '#0B6BCB',
+          600: '#185EA5',
+          700: '#12467B',
+          800: '#0A2744',
+          900: '#051423',
+          plainColor: '#0B6BCB',
         },
 
         // 배경

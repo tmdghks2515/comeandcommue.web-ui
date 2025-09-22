@@ -12,8 +12,8 @@ type PostDto = {
   commentCount: number
   communityType: CommunityType
   liked: boolean
-  postedAt: string // ISO date string
-  createdAt: string // ISO date string
+  postedAt: Date
+  createdAt: Date
 }
 
 export type { PostDto }

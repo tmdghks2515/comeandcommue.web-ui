@@ -44,7 +44,7 @@ function GlobalChat() {
       setMessages(data.reverse())
     },
     initalParams: 0,
-    executeImmediately: true,
+    immediate: true,
   })
 
   // 2. 메시지 전송

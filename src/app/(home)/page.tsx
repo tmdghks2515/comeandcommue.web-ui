@@ -3,65 +3,79 @@
 import { postQueryService } from '@/core/services/post.query.service'
 import useApi from '@/hooks/useApi'
 import { CircularProgress, List, ListItem, Sheet, styled, useColorScheme } from '@mui/joy'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import CommuFilterChips from './_components/CommuFilterChips'
 import { PostDto } from '@/core/dto/post/post.dto'
 import PostListItem from './_components/PostListItem'
 import useInfiniteScroll from '@/hooks/useInfiniteScroll'
 import { RecentPostsQuery } from '@/core/dto/post/post.query'
 import useCommuFilterStore from '@/store/useCommuFilterStore'
+import NewPostsNotice from './_components/NewPostsNotice'
 
 const pageSize = 50
 
 export default function Home() {
   const [posts, setPosts] = useState<PostDto[]>([])
-  const [lastCreatedAt, setLastCreatedAt] = useState<string>()
-  const [fetching, setIsFetching] = useState(false)
+  const [createdAtFrom, setCreatedAtFrom] = useState<Date>()
+  const [createdAtTo, setCreatedAtTo] = useState<Date>()
   const [hasNextPage, setHasNextPage] = useState(true)
 
   const selectedCommunities = useCommuFilterStore((state) => state.selected)
 
-  const { execute } = useApi({
+  const { execute, loading } = useApi({
     api: postQueryService.getRecentPosts,
     onSuccess(data, params) {
-      if (params.lastCreatedAt) {
+      if (params.createdAtFrom) {
         setPosts((prev) => [...prev, ...data])
+      } else if (params.createdAtTo) {
+        setCreatedAtTo(data?.[0]?.createdAt)
+        setPosts((prev) => [...data, ...prev])
       } else {
         setPosts(data)
+        setCreatedAtTo(data?.[0]?.createdAt)
       }
       setHasNextPage(data.length > 0)
     },
-    onComplete() {
-      setIsFetching(false)
-    },
   })
 
+  const handleLoadNewPosts = useCallback(() => {
+    execute({ communityTypes: selectedCommunities, pageSize, createdAtFrom: undefined, createdAtTo })
+  }, [selectedCommunities, execute, createdAtFrom])
+
+  /** useEffect Start */
+  useEffect(() => {
+    if (!createdAtFrom || !hasNextPage) return
+
+    execute({
+      communityTypes: selectedCommunities,
+      pageSize,
+      createdAtFrom: createdAtFrom,
+      isNextPage: true,
+    } as RecentPostsQuery)
+  }, [createdAtFrom])
+
+  useEffect(() => {
+    if (createdAtFrom) setCreatedAtFrom(undefined)
+
+    execute({ communityTypes: selectedCommunities, pageSize, createdAtFrom: undefined })
+  }, [selectedCommunities])
+  /** useEffect End */
+
+  /** 무한 스크롤 Start */
   const sentinelRef = useRef<HTMLDivElement | null>(null)
 
   useInfiniteScroll({
     targetRef: sentinelRef,
-    onLoadMore: () => setLastCreatedAt(posts?.[posts.length - 1]?.createdAt),
+    onLoadMore: () => setCreatedAtFrom(posts?.[posts.length - 1]?.createdAt),
     hasNextPage,
-    fetching,
+    fetching: loading,
   })
-
-  useEffect(() => {
-    if (!lastCreatedAt || !hasNextPage) return
-
-    setIsFetching(true)
-    execute({ communityTypes: selectedCommunities, pageSize, lastCreatedAt, isNextPage: true } as RecentPostsQuery)
-  }, [lastCreatedAt])
-
-  useEffect(() => {
-    if (lastCreatedAt) setLastCreatedAt(undefined)
-
-    setIsFetching(true)
-    execute({ communityTypes: selectedCommunities, pageSize, lastCreatedAt: undefined })
-  }, [selectedCommunities])
+  /** 무한 스크롤 End */
 
   return (
     <Container>
       <CommuFilterChips />
+      <NewPostsNotice createdAtTo={createdAtTo} onClick={handleLoadNewPosts} communityTypes={selectedCommunities} />
 
       <PostList>
         {posts?.map((post) => (
@@ -72,7 +86,7 @@ export default function Home() {
       </PostList>
 
       <div ref={sentinelRef} style={{ height: '1px' }} />
-      {fetching && (
+      {loading && (
         <LoadingContainer>
           <CircularProgress size="sm" />
         </LoadingContainer>
@@ -87,6 +101,9 @@ const Container = styled(Sheet)(({ theme }) => ({
   gap: theme.spacing(1),
   padding: theme.spacing(1.5),
   backgroundColor: theme.palette.background.body,
+  [theme.breakpoints.up('lg')]: {
+    maxWidth: '48rem',
+  },
 }))
 
 const PostList = styled(List)(({ theme }) => ({
