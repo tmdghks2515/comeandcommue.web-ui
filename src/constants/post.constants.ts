@@ -25,18 +25,18 @@ const communityValueLabels: ValueLabel[] = [
     value: 'BOBAEDREAM',
     label: '보배드림',
   },
-  // {
-  //   value: 'MLBPARK',
-  //   label: 'MLB파크',
-  // },
-  // {
-  //   value: 'INVEN',
-  //   label: '인벤',
-  // },
-  // {
-  //   value: 'ARCALIVE',
-  //   label: '아카라이브',
-  // },
+  {
+    value: 'MLBPARK',
+    label: 'MLB파크',
+  },
+  {
+    value: 'INVEN',
+    label: '인벤',
+  },
+  {
+    value: 'ARCALIVE',
+    label: '아카라이브',
+  },
   // {
   //   value: 'NATEPANN',
   //   label: '네이트판',
@@ -51,7 +51,7 @@ const communityValueLabels: ValueLabel[] = [
   // },
   // {
   //   value: 'HUMORUNIV',
-  //   label: '유머유니버스',
+  //   label: '웃긴대학',
   // },
   // {
   //   value: 'ETOLAND',

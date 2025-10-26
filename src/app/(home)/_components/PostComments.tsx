@@ -132,7 +132,6 @@ const PostComments = ({ post, onCommented }: Props) => {
       <MessagesRoot ref={containerRef}>
         {comments.map((msg, idx) => (
           <MessageItem key={idx} nicknameColor={getColorFromNickname(msg.senderNickname)}>
-            <span>{formatDateTime(msg.timestamp)}</span>
             <span>{msg.senderNickname}</span>
             <span>{msg.content}</span>
           </MessageItem>
@@ -174,9 +173,6 @@ const MessageItem = styled('p')<{ nicknameColor: string }>(({ theme, nicknameCol
     marginRight: theme.spacing(1),
   },
   '& span:first-of-type': {
-    color: '#cfcfcf',
-  },
-  '& span:nth-of-type(2)': {
     fontWeight: 'bold',
     color: nicknameColor,
   },

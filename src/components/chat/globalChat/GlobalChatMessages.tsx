@@ -37,7 +37,6 @@ function GlobalChatMessages({ messages, topRef, bottomRef, wrapperRef, folded, o
       {messages.map((msg, idx) => (
         <ListItem key={idx} sx={{ padding: 0 }}>
           <MessageItem nicknameColor={getColorFromNickname(msg.senderNickname)}>
-            <span>{formatDateTime(msg.timestamp)}</span>
             <span>{msg.senderNickname}</span>
             {msg.messageType === 'POST_COMMENT' && msg.target ? (
               <MessageItemTarget onClick={() => onClickPostTarget(msg.target!.id)}>
@@ -70,9 +69,6 @@ const MessageItem = styled('p')<{ nicknameColor: string }>(({ theme, nicknameCol
     marginRight: theme.spacing(1),
   },
   '& span:first-of-type': {
-    color: '#cfcfcf',
-  },
-  '& span:nth-of-type(2)': {
     fontWeight: 'bold',
     color: nicknameColor,
   },
