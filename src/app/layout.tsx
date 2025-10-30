@@ -51,3 +51,7 @@ export default function RootLayout({
     </html>
   )
 }
+
+export const revalidate = 0 // ISR 비활성화
+export const dynamic = 'force-dynamic' // 페이지 캐시 X
+export const fetchCache = 'force-no-store' // fetch 캐시 X
