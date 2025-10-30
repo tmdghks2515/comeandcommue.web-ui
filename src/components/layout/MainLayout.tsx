@@ -12,13 +12,15 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
 const MainLayoutRoot = styled('div')(({ theme }) => ({
   backgroundColor: theme.palette.background.body,
-  minHeight: '100vh',
 }))
 
 const MainLayoutContainer = styled('div')(({ theme }) => ({
   width: '100%',
   maxWidth: '1200px',
   margin: '0 auto',
+  display: 'flex',
+  flexDirection: 'column',
+  minHeight: '100vh',
 
   // 태블릿 이상
   [theme.breakpoints.up('sm')]: {

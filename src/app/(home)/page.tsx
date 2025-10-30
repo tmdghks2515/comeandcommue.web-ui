@@ -1,119 +1,42 @@
-'use client'
-
-import { postQueryService } from '@/core/services/post.query.service'
-import useApi from '@/hooks/useApi'
-import { CircularProgress, List, ListItem, Sheet, styled, useColorScheme } from '@mui/joy'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Sheet, Typography } from '@mui/joy'
 import CommuFilterChips from './_components/CommuFilterChips'
-import { PostDto } from '@/core/dto/post/post.dto'
-import PostListItem from './_components/PostListItem'
-import useInfiniteScroll from '@/hooks/useInfiniteScroll'
-import { RecentPostsQuery } from '@/core/dto/post/post.query'
-import useCommuFilterStore from '@/store/useCommuFilterStore'
-import NewPostsNotice from './_components/NewPostsNotice'
-
-const pageSize = 50
+import PostList from './_components/PostList'
 
 export default function Home() {
-  const [posts, setPosts] = useState<PostDto[]>([])
-  const [createdAtFrom, setCreatedAtFrom] = useState<Date>()
-  const [createdAtTo, setCreatedAtTo] = useState<Date>()
-  const [hasNextPage, setHasNextPage] = useState(true)
-
-  const selectedCommunities = useCommuFilterStore((state) => state.selected)
-
-  const { execute, loading } = useApi({
-    api: postQueryService.getRecentPosts,
-    onSuccess(data, params) {
-      if (params.createdAtFrom) {
-        setPosts((prev) => [...prev, ...data])
-      } else if (params.createdAtTo) {
-        setCreatedAtTo(data?.[0]?.createdAt)
-        setPosts((prev) => [...data, ...prev])
-      } else {
-        setPosts(data)
-        setCreatedAtTo(data?.[0]?.createdAt)
-      }
-      setHasNextPage(data.length > 0)
-    },
-  })
-
-  const handleLoadNewPosts = useCallback(() => {
-    execute({ communityTypes: selectedCommunities, pageSize, createdAtFrom: undefined, createdAtTo })
-  }, [selectedCommunities, execute, createdAtFrom])
-
-  /** useEffect Start */
-  useEffect(() => {
-    if (!createdAtFrom || !hasNextPage) return
-
-    execute({
-      communityTypes: selectedCommunities,
-      pageSize,
-      createdAtFrom: createdAtFrom,
-      isNextPage: true,
-    } as RecentPostsQuery)
-  }, [createdAtFrom])
-
-  useEffect(() => {
-    if (createdAtFrom) setCreatedAtFrom(undefined)
-
-    execute({ communityTypes: selectedCommunities, pageSize, createdAtFrom: undefined })
-  }, [selectedCommunities])
-  /** useEffect End */
-
-  /** 무한 스크롤 Start */
-  const sentinelRef = useRef<HTMLDivElement | null>(null)
-
-  useInfiniteScroll({
-    targetRef: sentinelRef,
-    onLoadMore: () => setCreatedAtFrom(posts?.[posts.length - 1]?.createdAt),
-    hasNextPage,
-    fetching: loading,
-  })
-  /** 무한 스크롤 End */
-
   return (
-    <Container>
-      <CommuFilterChips />
-      <NewPostsNotice createdAtTo={createdAtTo} onClick={handleLoadNewPosts} communityTypes={selectedCommunities} />
+    <>
+      <Sheet
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1,
+          p: 1.5,
+          bgcolor: 'background.body',
+          maxWidth: { lg: '48rem' },
+        }}
+      >
+        <Typography level="h1" fontSize={'md'} mb={1}>
+          실시간 커뮤니티 인기글 모음
+        </Typography>
 
-      <PostList>
-        {posts?.map((post) => (
-          <ListItem key={post.id} sx={{ padding: 0 }}>
-            <PostListItem post={post} />
-          </ListItem>
-        ))}
-      </PostList>
+        <CommuFilterChips />
+        <section>
+          <PostList />
+        </section>
+      </Sheet>
 
-      <div ref={sentinelRef} style={{ height: '1px' }} />
-      {loading && (
-        <LoadingContainer>
-          <CircularProgress size="sm" />
-        </LoadingContainer>
-      )}
-    </Container>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebPage',
+            name: '커뮤니티 모음',
+            description:
+              '디시인사이드, 펨코(fmkorea), 더쿠, 루리웹, 인스티즈, 보배드림 등 주요 커뮤니티의 실시간 인기글을 한곳에서 모아보세요.',
+          }),
+        }}
+      />
+    </>
   )
 }
-
-const Container = styled(Sheet)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: theme.spacing(1),
-  padding: theme.spacing(1.5),
-  backgroundColor: theme.palette.background.body,
-  [theme.breakpoints.up('lg')]: {
-    maxWidth: '48rem',
-  },
-}))
-
-const PostList = styled(List)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: theme.spacing(1.5),
-}))
-
-const LoadingContainer = styled('div')({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-})

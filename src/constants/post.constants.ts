@@ -37,26 +37,26 @@ const communityValueLabels: ValueLabel[] = [
     value: 'ARCALIVE',
     label: '아카라이브',
   },
-  // {
-  //   value: 'NATEPANN',
-  //   label: '네이트판',
-  // },
-  // {
-  //   value: 'CLIEN',
-  //   label: '클리앙',
-  // },
-  // {
-  //   value: 'INSTIZ',
-  //   label: '인스티즈',
-  // },
-  // {
-  //   value: 'HUMORUNIV',
-  //   label: '웃긴대학',
-  // },
-  // {
-  //   value: 'ETOLAND',
-  //   label: '에토랜드',
-  // },
+  {
+    value: 'NATEPANN',
+    label: '네이트판',
+  },
+  {
+    value: 'CLIEN',
+    label: '클리앙',
+  },
+  {
+    value: 'INSTIZ',
+    label: '인스티즈',
+  },
+  {
+    value: 'HUMORUNIV',
+    label: '웃긴대학',
+  },
+  {
+    value: 'ETOLAND',
+    label: '이토랜드',
+  },
   // {
   //   value: 'COOK82',
   //   label: '82쿡',

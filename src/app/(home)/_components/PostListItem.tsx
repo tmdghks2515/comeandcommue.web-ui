@@ -157,7 +157,7 @@ const HeaderRow = styled('div')({
   justifyContent: 'space-between',
 })
 
-const Title = styled('div')(({ theme }) => ({
+const Title = styled('p')(({ theme }) => ({
   ...theme.typography['body-sm'],
   fontWeight: theme.fontWeight.lg,
   color: theme.vars.palette.text.primary,

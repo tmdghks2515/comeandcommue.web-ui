@@ -1,6 +1,6 @@
 'use client'
 
-import { Dropdown, IconButton, Menu, MenuButton, MenuItem, styled, Typography, useColorScheme } from '@mui/joy'
+import { Dropdown, IconButton, Menu, MenuButton, MenuItem, styled, useColorScheme } from '@mui/joy'
 import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import useLoginUserStore from '@/store/useLoginUserStore'
@@ -8,6 +8,8 @@ import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined
 import useApi from '@/hooks/useApi'
 import { userService } from '@/core/services/user.service'
 import { useCallback, memo } from 'react'
+import Link from 'next/link'
+import MainLogo from '../common/MainLogo'
 
 function MainHeader() {
   const { mode, setMode } = useColorScheme()
@@ -27,7 +29,7 @@ function MainHeader() {
   return (
     <HeaderRoot>
       <HeaderPart1>
-        <Title>summit</Title>
+        <MainLogo />
       </HeaderPart1>
 
       <HeaderPart2>
@@ -57,7 +59,7 @@ function MainHeader() {
 export default memo(MainHeader)
 
 const HeaderRoot = styled('header')(({ theme }) => ({
-  padding: `${theme.spacing(2)} ${theme.spacing(1)}`,
+  padding: `${theme.spacing(1)} ${theme.spacing(1)}`,
   borderBottom: `1px solid ${theme.palette.divider}`,
   display: 'flex',
   alignItems: 'center',
@@ -65,7 +67,7 @@ const HeaderRoot = styled('header')(({ theme }) => ({
 
   // 태블릿 이상
   [theme.breakpoints.up('sm')]: {
-    padding: `${theme.spacing(3)} ${theme.spacing(2)}`,
+    padding: `${theme.spacing(2)} ${theme.spacing(1)}`,
   },
 }))
 
@@ -83,10 +85,3 @@ const HeaderPart3 = styled('div')({
   alignItems: 'center',
   gap: 2,
 })
-
-const Title = styled(Typography)(({ theme }) => ({
-  fontWeight: 'bold',
-  fontSize: '1.5rem',
-  marginRight: theme.spacing(4),
-  paddingLeft: theme.spacing(1),
-}))
