@@ -1,6 +1,5 @@
 import { ImageResponse } from 'next/og'
 export const runtime = 'edge'
-export const size = { width: 1200, height: 630 }
 
 export async function GET(req: Request) {
   return new ImageResponse(
@@ -20,6 +19,6 @@ export async function GET(req: Request) {
         {'그랬대!'}
       </div>
     ),
-    size,
+    { width: 1200, height: 630 },
   )
 }
