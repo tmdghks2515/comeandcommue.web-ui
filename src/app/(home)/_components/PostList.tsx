@@ -10,6 +10,7 @@ import { RecentPostsQuery } from '@/core/dto/post/post.query'
 import useCommuFilterStore from '@/store/useCommuFilterStore'
 import PostListItem from './PostListItem'
 import NewPostsNotice from './NewPostsNotice'
+import useLoginUserStore from '@/store/useLoginUserStore'
 
 const pageSize = 50
 
@@ -20,6 +21,7 @@ export default function PostList() {
   const [hasNextPage, setHasNextPage] = useState(true)
 
   const selectedCommunities = useCommuFilterStore((state) => state.selected)
+  const { loginUser } = useLoginUserStore()
 
   const { execute, loading } = useApi({
     api: postQueryService.getRecentPosts,
@@ -43,7 +45,7 @@ export default function PostList() {
 
   /** useEffect Start */
   useEffect(() => {
-    if (!createdAtFrom || !hasNextPage) return
+    if (!createdAtFrom || !hasNextPage || !loginUser) return
 
     execute({
       communityTypes: selectedCommunities,
@@ -51,7 +53,7 @@ export default function PostList() {
       createdAtFrom: createdAtFrom,
       isNextPage: true,
     } as RecentPostsQuery)
-  }, [createdAtFrom])
+  }, [createdAtFrom, loginUser])
 
   useEffect(() => {
     if (createdAtFrom) setCreatedAtFrom(undefined)
