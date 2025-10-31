@@ -41,8 +41,8 @@ pipeline {
               cd ${DEPLOY_DIR}
               export IMAGE_TAG=${IMAGE_TAG}
               set -a; [ -f .env ] && . ./.env; set +a
-              docker-compose pull ${SERVICE}
-              docker-compose up -d --no-deps ${SERVICE}
+              docker compose pull ${SERVICE}
+              docker compose up -d --no-deps ${SERVICE}
             '
           """)
         }
