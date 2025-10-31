@@ -1,10 +1,10 @@
 pipeline {
   agent any
   environment {
-    REGISTRY    = '192.168.219.113:5000'  // A서버(사설 레지스트리)
-    DEPLOY_HOST = '192.168.219.145'       // B서버
-    DEPLOY_DIR  = '/srv/apps/daneyo'
-    SERVICE     = 'web'      // 각 서비스마다 변경
+    REGISTRY    = '192.168.219.113:5000'   // A서버 (private registry)
+    DEPLOY_HOST = '192.168.219.145'        // B서버 (실행 서버)
+    DEPLOY_DIR  = '/srv/apps/myplatform'
+    SERVICE     = 'web'
     IMAGE_TAG   = "${env.BUILD_NUMBER}"
   }
 
@@ -13,17 +13,11 @@ pipeline {
       steps { checkout scm }
     }
 
-    stage('Build') {
-      steps {
-        sh 'chmod +x gradlew || true'
-        sh './gradlew --no-daemon clean bootJar -x test'
-      }
-    }
-
+    // 로컬 빌드는 건너뛰고, Dockerfile 안에서 npm ci && npm run build 수행
     stage('Docker Build & Push') {
       steps {
         script {
-          def image = "${REGISTRY}/${SERVICE}:${IMAGE_TAG}"
+          def image  = "${REGISTRY}/${SERVICE}:${IMAGE_TAG}"
           def latest = "${REGISTRY}/${SERVICE}:latest"
           sh """
             docker build -t ${image} -t ${latest} .
@@ -40,7 +34,9 @@ pipeline {
           ssh -o StrictHostKeyChecking=no ubuntu@${DEPLOY_HOST} '
             set -e
             cd ${DEPLOY_DIR}
+            # 새 태그로 교체
             sed -i "s/^IMAGE_TAG=.*/IMAGE_TAG=${IMAGE_TAG}/" .env
+            # web 서비스만 롤링
             docker compose --env-file .env pull ${SERVICE}
             docker compose --env-file .env up -d --no-deps ${SERVICE}
           '
