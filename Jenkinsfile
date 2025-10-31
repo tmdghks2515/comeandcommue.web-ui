@@ -39,6 +39,7 @@ pipeline {
             ssh -i "\$SSH_KEY" -o StrictHostKeyChecking=no \$SSH_USER@${DEPLOY_HOST} '
               set -e
               cd ${DEPLOY_DIR}
+              export COMPOSE_PROJECT_NAME=daneyo
               export IMAGE_TAG=${IMAGE_TAG}
               set -a; [ -f .env ] && . ./.env; set +a
               docker compose -p "$COMPOSE_PROJECT_NAME" pull ${SERVICE}
