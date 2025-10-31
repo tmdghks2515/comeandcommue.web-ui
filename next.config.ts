@@ -35,6 +35,7 @@ const nextConfig: NextConfig = {
       { source: '/api/chat/:path*', destination: process.env.NEXT_PUBLIC_CHAT_API_URL + '/:path*' },
     ]
   },
+  output: 'standalone',
 }
 
 export default nextConfig
