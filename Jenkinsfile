@@ -36,19 +36,26 @@ pipeline {
       }
     }
 
-    stage('Deploy') {
-      steps {
-        sh '''
-          ssh -o StrictHostKeyChecking=no "ubuntu@$DEPLOY_HOST" '
-            set -e
-            cd "$DEPLOY_DIR"
-            sed -i "s/^IMAGE_TAG=.*/IMAGE_TAG='"$IMAGE_TAG"'/" .env
-            docker compose --env-file .env pull "$SERVICE"
-            docker compose --env-file .env up -d --no-deps "$SERVICE"
-          '
-        '''
-      }
+stage('Deploy') {
+  steps {
+    withCredentials([sshUserPrivateKey(
+      credentialsId: 'anan-server-ssh',
+      keyFileVariable: 'SSH_KEY',
+      usernameVariable: 'SSH_USER' // anan
+    )]) {
+      sh(script: """
+        ssh -i "\$SSH_KEY" -o StrictHostKeyChecking=no \$SSH_USER@${DEPLOY_HOST} '
+          set -e
+          cd ${DEPLOY_DIR}
+          export IMAGE_TAG=${IMAGE_TAG}
+          set -a; [ -f .env ] && . ./.env; set +a
+          docker-compose pull ${SERVICE}
+          docker-compose up -d --no-deps ${SERVICE}
+        '
+      """)
     }
+  }
+}
   }
 
   post {
