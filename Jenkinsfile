@@ -41,8 +41,8 @@ pipeline {
               cd ${DEPLOY_DIR}
               export IMAGE_TAG=${IMAGE_TAG}
               set -a; [ -f .env ] && . ./.env; set +a
-              docker compose -p pull ${SERVICE}
-              docker compose -p up -d --no-deps --force-recreate --remove-orphans ${SERVICE}
+              docker compose -p "$COMPOSE_PROJECT_NAME" pull ${SERVICE}
+              docker compose -p "$COMPOSE_PROJECT_NAME" up -d --no-deps --force-recreate --remove-orphans ${SERVICE}
             '
           """)
         }
