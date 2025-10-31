@@ -3,7 +3,7 @@ pipeline {
   environment {
     REGISTRY    = '192.168.219.113:5000'   // A서버 (private registry)
     DEPLOY_HOST = '192.168.219.145'        // B서버 (실행 서버)
-    DEPLOY_DIR  = '/srv/apps/myplatform'
+    DEPLOY_DIR  = '/srv/apps/daneyo'
     SERVICE     = 'web'
     IMAGE_TAG   = "${env.BUILD_NUMBER}"
   }
