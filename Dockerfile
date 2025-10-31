@@ -14,7 +14,7 @@ ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000
 # standalone 산출물만 복사
-COPY --from=build /app/.next/standalone ./      # server.js 포함
+COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static
 COPY --from=build /app/public ./public
 # 비루트 실행
