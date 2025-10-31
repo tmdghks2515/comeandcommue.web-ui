@@ -10,7 +10,6 @@ export default function LoginUserProvider() {
     api: userService.createUser,
     onSuccess: (data) => {
       setLoginUser(data)
-      window.location.reload()
     },
     onError: (err) => {
       alert('알 수 없는 오류가 발생했습니다.')

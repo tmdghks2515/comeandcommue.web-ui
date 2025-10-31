@@ -45,7 +45,7 @@ export default function PostList() {
 
   /** useEffect Start */
   useEffect(() => {
-    if (!createdAtFrom || !hasNextPage || !loginUser) return
+    if (!createdAtFrom || !hasNextPage) return
 
     execute({
       communityTypes: selectedCommunities,
@@ -56,10 +56,10 @@ export default function PostList() {
   }, [createdAtFrom, loginUser])
 
   useEffect(() => {
+    if (!loginUser.nickname) return
     if (createdAtFrom) setCreatedAtFrom(undefined)
-
     execute({ communityTypes: selectedCommunities, pageSize, createdAtFrom: undefined })
-  }, [selectedCommunities])
+  }, [selectedCommunities, loginUser])
   /** useEffect End */
 
   /** 무한 스크롤 Start */
